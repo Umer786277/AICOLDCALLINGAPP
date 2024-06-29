@@ -43,3 +43,37 @@ class CustomUser(AbstractUser):
         user_data_file = os.path.join(user_data_folder, 'user_data.json')
         with open(user_data_file, 'w') as file:
             json.dump(data, file)
+
+
+
+
+class Company(models.Model):
+    name = models.CharField(max_length=100)
+    number = models.CharField(max_length=15)
+    company = models.CharField(max_length=100)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+
+
+class Call(models.Model):
+    call_id = models.CharField(max_length=255)
+    phone_number_id = models.CharField(max_length=255)
+    created_at = models.DateTimeField()
+    assistant_first_message = models.CharField(max_length=255)
+    customer_number = models.CharField(max_length=20)
+    status = models.CharField(max_length=50)
+    cost = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.call_id
+
+class CallSummary(models.Model):
+    call = models.OneToOneField(Call, on_delete=models.CASCADE, related_name='summary')
+    summary = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Summary for {self.call.call_id}'
