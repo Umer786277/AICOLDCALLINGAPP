@@ -1,0 +1,53 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>{% block head_title %}{% endblock head_title %} | UBold - Responsive Admin Dashboard Template</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
+  <meta content="Coderthemes" name="author" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+  <!--[if lt IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <![endif]-->
+
+  <!-- App favicon -->
+  <link rel="icon" href="{% static 'images/favicon.ico' %}">
+
+  {% block css %}
+
+  {% block extra_css %}
+  {% endblock %}
+  <!-- This file stores project-specific CSS -->
+
+  {% block css_wrapper %}
+  {% include "partials/head-css.html" %}
+  {% endblock css_wrapper %}
+
+  <!-- icons -->
+  <link href="{% static 'css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+
+  {% endblock %}
+</head>
+
+<body {% block body_extra %}{% endblock %}>
+  
+  
+
+  {% block page_content %}{% endblock %}
+</body>
+
+<!-- Le javascript
+  ================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+{% block javascript %}
+<script src="{% static 'js/vendor.min.js' %}"></script>
+{% block extra_javascript %}{% endblock %}
+<script src="{% static 'js/bundle.min.js' %}"></script>
+{% endblock javascript %}
+{% block extra_javascript_bottom %}{% endblock %}
+</html>

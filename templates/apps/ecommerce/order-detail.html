@@ -1,0 +1,172 @@
+{% extends "vertical_base.html" %}
+{% load static i18n %}
+
+{% block head_title %}{% trans "Order Details" %}{% endblock head_title %}
+
+{% block content %}
+<!-- Start Content-->
+<div class="container-fluid">
+    
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">UBold</a></li>
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">Ecommerce</a></li>
+                        <li class="breadcrumb-item active">Order Detail</li>
+                    </ol>
+                </div>
+                <h4 class="page-title">Order Detail</h4>
+            </div>
+        </div>
+    </div>     
+    <!-- end page title --> 
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="header-title mb-3">Track Order</h4>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="mb-4">
+                                <h5 class="mt-0">Order ID:</h5>
+                                <p>{{order.orderID}}</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-4">
+                                <h5 class="mt-0">Tracking ID:</h5>
+                                <p>{{order.trackOrderData.trackingID}}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="track-order-list">
+                        <ul class="list-unstyled">
+                            {% for status in order.trackOrderData.trackerData %}
+                            <li class="{% if status.status == 'completed' %} completed {% endif %}">
+                                {% if status.status == 'active' %} <span class="active-dot dot"></span> {% endif %}
+                                <h5 class="mt-0 mb-1">{{status.name}}</h5>
+                                <p class="text-muted">{{status.date}} <small class="text-muted">{{status.time}}</small> </p>
+                            </li>
+                            {% endfor %}
+                        </ul>
+
+                        <div class="text-center mt-4">
+                            <a href="#" class="btn btn-primary">Show Details</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="header-title mb-3">Items from Order {{order.orderID}}</h4>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-centered mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product name</th>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in order.billData.prodects %}
+                                <tr>
+                                    <th scope="row">{{product.name}}</th>
+                                    <td><img src="{{product.img}}" alt="product-img" height="32"></td>
+                                    <td>{{product.quantity}}</td>
+                                    <td>{{product.price}}</td>
+                                    <td>{{product.total}}</td>
+                                </tr>
+                                {% endfor %}
+                                <tr>
+                                    <th scope="row" colspan="4" class="text-end">Sub Total :</th>
+                                    <td><div class="fw-bold">{{order.billData.subTotal}}</div></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" colspan="4" class="text-end">Shipping Charge :</th>
+                                    <td>{{order.billData.shippingCharge}}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" colspan="4" class="text-end">Estimated Tax :</th>
+                                    <td>{{order.billData.estimatedTax}}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" colspan="4" class="text-end">Total :</th>
+                                    <td><div class="fw-bold">{{order.billData.total}}</div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end row -->
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="header-title mb-3">Shipping Information</h4>
+
+                    <h5 class="font-family-primary fw-semibold">{{order.shippingInformation.name}}</h5>
+                    
+                    <p class="mb-2"><span class="fw-semibold me-2">Address:</span> {{order.shippingInformation.address}}</p>
+                    <p class="mb-2"><span class="fw-semibold me-2">Phone:</span> {{order.shippingInformation.phone}}</p>
+                    <p class="mb-0"><span class="fw-semibold me-2">Mobile:</span> {{order.shippingInformation.mobile}}</p>
+
+                </div>
+            </div>
+        </div> <!-- end col -->
+    
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="header-title mb-3">Billing Information</h4>
+
+                    <ul class="list-unstyled mb-0">
+                        <li>
+                            <p class="mb-2"><span class="fw-semibold me-2">Payment Type:</span> {{order.billingInformation.paymentType}}</p>
+                            <p class="mb-2"><span class="fw-semibold me-2">Provider:</span> {{order.billingInformation.provider}}</p>
+                            <p class="mb-2"><span class="fw-semibold me-2">Valid Date:</span> {{order.billingInformation.validDate}}</p>
+                            <p class="mb-0"><span class="fw-semibold me-2">CVV:</span> {{order.billingInformation.CVV}}</p>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+        </div> <!-- end col -->
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="header-title mb-3">Delivery Info</h4>
+
+                    <div class="text-center">
+                        <i class="mdi mdi-truck-fast h2 text-muted"></i>
+                        <h5><b>UPS Delivery</b></h5>
+                        <p class="mb-1"><span class="fw-semibold">Order ID :</span> {{order.deliveryInfo.orderID}}</p>
+                        <p class="mb-0"><span class="fw-semibold">Payment Mode :</span> {{order.deliveryInfo.paymentMode}}</p>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end col -->
+
+    </div>
+    <!-- end row -->
+    
+</div> <!-- container -->
+
+{% endblock %}

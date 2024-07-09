@@ -1,0 +1,348 @@
+{% extends "vertical_base.html" %}
+{% load static i18n %}
+
+{% block head_title %}{% trans "Dashboard 2" %}{% endblock head_title %}
+
+{% block extra_css %}
+
+<!-- third party css -->
+<link href="{% static 'libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css' %}" rel="stylesheet"
+    type="text/css" />
+<!-- third party css end -->
+
+{% endblock %}
+
+{% block content %}
+<!-- Start Content-->
+<div class="container-fluid">
+
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">UBold</a></li>
+                        <li class="breadcrumb-item active">Dashboard 2</li>
+                    </ol>
+                </div>
+                <h4 class="page-title">Dashboard 2</h4>
+            </div>
+        </div>
+    </div>
+    <!-- end page title -->
+
+    <div class="row">
+        {% for data in statistics %}
+        <div class="col-md-6 col-xl-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="avatar-sm bg-{{data.color}} rounded">
+                                <i class="{{data.icon}} avatar-title font-22 text-white"></i>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-end">
+                                <h3 class="text-dark my-1">{{data.symbolbefore}}<span
+                                        data-plugin="counterup">{{data.amount}}</span></h3>
+                                <p class="text-muted mb-1 text-truncate">{{data.name}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h6 class="text-uppercase">Target <span class="float-end">{{data.target}}%</span></h6>
+                        <div class="progress progress-sm m-0">
+                            <div class="progress-bar bg-{{data.color}}" role="progressbar"
+                                aria-valuenow="{{data.target}}" aria-valuemin="0" aria-valuemax="100"
+                                style="width: {{data.target}}%">
+                                <span class="visually-hidden">{{data.target}}% Complete</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- end card-->
+        </div> <!-- end col -->
+        {% endfor %}
+
+    </div>
+    <!-- end row -->
+
+    <div class="row">
+        <div class="col-xl-4 col-md-12">
+            <!-- Portlet card -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-widgets">
+                        <a href="javascript: void(0);" data-toggle="reload"><i class="mdi mdi-refresh"></i></a>
+                        <a data-bs-toggle="collapse" href="#cardCollpase1" role="button" aria-expanded="false"
+                            aria-controls="cardCollpase1"><i class="mdi mdi-minus"></i></a>
+                        <a href="javascript: void(0);" data-toggle="remove"><i class="mdi mdi-close"></i></a>
+                    </div>
+                    <h4 class="header-title mb-0">Lifetime Sales</h4>
+
+                    <div id="cardCollpase1" class="collapse pt-3 show">
+                        <div class="text-center">
+                            <div id="lifetime-sales" data-colors="#00acc1,#f1556c"></div>
+
+                            <div class="row mt-3">
+                                <div class="col-4">
+                                    <p class="text-muted font-15 mb-1 text-truncate">Target</p>
+                                    <h4><i class="fe-arrow-down text-danger me-1"></i>$7.8k</h4>
+                                </div>
+                                <div class="col-4">
+                                    <p class="text-muted font-15 mb-1 text-truncate">Last week</p>
+                                    <h4><i class="fe-arrow-up text-success me-1"></i>$1.4k</h4>
+                                </div>
+                                <div class="col-4">
+                                    <p class="text-muted font-15 mb-1 text-truncate">Last Month</p>
+                                    <h4><i class="fe-arrow-down text-danger me-1"></i>$9.8k</h4>
+                                </div>
+                            </div> <!-- end row -->
+
+                        </div>
+                    </div> <!-- collapsed end -->
+                </div> <!-- end card-body -->
+            </div> <!-- end card-->
+        </div> <!-- end col-->
+
+        <div class="col-xl-4 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-widgets">
+                        <a href="javascript: void(0);" data-toggle="reload"><i class="mdi mdi-refresh"></i></a>
+                        <a data-bs-toggle="collapse" href="#cardCollpase2" role="button" aria-expanded="false"
+                            aria-controls="cardCollpase2"><i class="mdi mdi-minus"></i></a>
+                        <a href="javascript: void(0);" data-toggle="remove"><i class="mdi mdi-close"></i></a>
+                    </div>
+                    <h4 class="header-title mb-0">Income Amounts</h4>
+
+                    <div id="cardCollpase2" class="collapse pt-3 show">
+                        <div class="text-center">
+                            <div id="income-amounts" data-colors="#00acc1"></div>
+                            <div class="row mt-3">
+                                <div class="col-4">
+                                    <p class="text-muted font-15 mb-1 text-truncate">Target</p>
+                                    <h4><i class="fe-arrow-up text-success me-1"></i>641</h4>
+                                </div>
+                                <div class="col-4">
+                                    <p class="text-muted font-15 mb-1 text-truncate">Last week</p>
+                                    <h4><i class="fe-arrow-down text-danger me-1"></i>234</h4>
+                                </div>
+                                <div class="col-4">
+                                    <p class="text-muted font-15 mb-1 text-truncate">Last Month</p>
+                                    <h4><i class="fe-arrow-up text-success me-1"></i>3201</h4>
+                                </div>
+                            </div> <!-- end row -->
+                        </div>
+                    </div> <!-- collapsed end -->
+                </div> <!-- end card-body -->
+            </div> <!-- end card-->
+        </div> <!-- end col-->
+
+        <div class="col-xl-4 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-widgets">
+                        <a href="javascript: void(0);" data-toggle="reload"><i class="mdi mdi-refresh"></i></a>
+                        <a data-bs-toggle="collapse" href="#cardCollpase3" role="button" aria-expanded="false"
+                            aria-controls="cardCollpase3"><i class="mdi mdi-minus"></i></a>
+                        <a href="javascript: void(0);" data-toggle="remove"><i class="mdi mdi-close"></i></a>
+                    </div>
+                    <h4 class="header-title mb-0">Total Users</h4>
+
+                    <div id="cardCollpase3" class="collapse pt-3 show">
+                        <div class="text-center">
+                            <div id="total-users" data-colors="#00acc1,#4b88e4,#e3eaef,#fd7e14"></div>
+                            <div class="row mt-3">
+                                <div class="col-4">
+                                    <p class="text-muted font-15 mb-1 text-truncate">Target</p>
+                                    <h4><i class="fe-arrow-down text-danger me-1"></i>18k</h4>
+                                </div>
+                                <div class="col-4">
+                                    <p class="text-muted font-15 mb-1 text-truncate">Last week</p>
+                                    <h4><i class="fe-arrow-up text-success me-1"></i>3.25k</h4>
+                                </div>
+                                <div class="col-4">
+                                    <p class="text-muted font-15 mb-1 text-truncate">Last Month</p>
+                                    <h4><i class="fe-arrow-up text-success me-1"></i>28k</h4>
+                                </div>
+                            </div> <!-- end row -->
+                        </div>
+                    </div> <!-- collapsed end -->
+                </div> <!-- end card-body -->
+            </div> <!-- end card-->
+        </div> <!-- end col-->
+    </div>
+    <!-- end row -->
+
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-widgets">
+                        <a href="javascript: void(0);" data-toggle="reload"><i class="mdi mdi-refresh"></i></a>
+                        <a data-bs-toggle="collapse" href="#cardCollpase4" role="button" aria-expanded="false"
+                            aria-controls="cardCollpase4"><i class="mdi mdi-minus"></i></a>
+                        <a href="javascript: void(0);" data-toggle="remove"><i class="mdi mdi-close"></i></a>
+                    </div>
+                    <h4 class="header-title mb-0">Revenue By Location</h4>
+
+                    <div id="cardCollpase4" class="collapse pt-3 show">
+                        <div id="world-map-markers" style="height: 433px"></div>
+                    </div> <!-- collapsed end -->
+                </div> <!-- end card-body -->
+            </div> <!-- end card-->
+        </div> <!-- end col -->
+
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-widgets">
+                        <a href="javascript: void(0);" data-toggle="reload"><i class="mdi mdi-refresh"></i></a>
+                        <a data-bs-toggle="collapse" href="#cardCollpase5" role="button" aria-expanded="false"
+                            aria-controls="cardCollpase5"><i class="mdi mdi-minus"></i></a>
+                        <a href="javascript: void(0);" data-toggle="remove"><i class="mdi mdi-close"></i></a>
+                    </div>
+                    <h4 class="header-title mb-0">Top Selling Products</h4>
+
+                    <div id="cardCollpase5" class="collapse pt-3 show">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-centered mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for product in topSellingProducts %}
+                                    <tr>
+                                        <td>{{product.productName}}</td>
+                                        <td>{{product.symbolbefore}}
+                                            {{product.price}}</td>
+                                        <td>{{product.quantity}}</td>
+                                        <td>{{product.symbolbefore}}
+                                            {{product.amount}}</td>
+                                    </tr>
+                                    {% endfor %}
+
+                                </tbody>
+                            </table>
+                        </div> <!-- end table responsive-->
+                    </div> <!-- collapsed end -->
+                </div> <!-- end card-body -->
+            </div> <!-- end card-->
+        </div> <!-- end col -->
+    </div>
+    <!-- end row -->
+
+</div> <!-- container -->
+{% endblock %}
+
+{% block extra_javascript %}
+
+<!-- Third party js -->
+<script src="{% static 'libs/jquery-sparkline/jquery.sparkline.min.js' %}"></script>
+<script src="{% static 'libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js' %}"></script>
+<script src="{% static 'libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-world-mill-en.js' %}"></script>
+<!-- Third party js ends -->
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+
+        var DrawSparkline = function () {
+            // Line Chart
+            var lifetimeSalesSeries1Data = JSON.parse("{{lifetimeSalesSeries1|escapejs}}");
+            var lifetimeSalesSeries2Data = JSON.parse("{{lifetimeSalesSeries2|escapejs}}");
+
+            var incomeAmountsData = JSON.parse("{{incomeAmounts|escapejs}}");
+
+            var totalUsersData = JSON.parse("{{totalUsers|escapejs}}");
+
+            var colors = ['#00acc1', '#f1556c'];
+            var dataColors = $("#lifetime-sales").data('colors');
+            if (dataColors) {
+                colors = dataColors.split(",");
+            }
+
+            $("#lifetime-sales").sparkline(lifetimeSalesSeries1Data, {
+                type: "line",
+                width: "100%",
+                height: "220",
+                chartRangeMax: 50,
+                lineColor: colors[0],
+                fillColor: hexToRGB(colors[0], 0.3),
+                highlightLineColor: "rgba(0,0,0,.1)",
+                highlightSpotColor: "rgba(0,0,0,.2)",
+                maxSpotColor: !1,
+                minSpotColor: !1,
+                spotColor: !1,
+                lineWidth: 1,
+            });
+            $("#lifetime-sales").sparkline(lifetimeSalesSeries2Data, {
+                type: "line",
+                width: "100%",
+                height: "220",
+                chartRangeMax: 40,
+                lineColor: colors[1],
+                fillColor: hexToRGB(colors[1], 0.3),
+                composite: !0,
+                highlightLineColor: "rgba(0,0,0,.1)",
+                highlightSpotColor: "rgba(0,0,0,.2)",
+                maxSpotColor: !1,
+                minSpotColor: !1,
+                spotColor: !1,
+                lineWidth: 1,
+            });
+            // Bar Chart
+            var colors = ['#00acc1'];
+            var dataColors = $("#income-amounts").data('colors');
+            if (dataColors) {
+                colors = dataColors.split(",");
+            }
+            $("#income-amounts").sparkline(
+                incomeAmountsData,
+                {
+                    type: "bar",
+                    height: "220",
+                    barWidth: "10",
+                    barSpacing: "3",
+                    barColor: colors,
+                }
+            );
+            // Pie Chart
+            var colors = ['#00acc1', '#4b88e4', '#e3eaef', '#fd7e14'];
+            var dataColors = $("#total-users").data('colors');
+            if (dataColors) {
+                colors = dataColors.split(",");
+            }
+            $("#total-users").sparkline(totalUsersData, {
+                type: "pie",
+                width: "220",
+                height: "220",
+                sliceColors: colors,
+            });
+        };
+        DrawSparkline();
+        var resizeChart;
+        $(window).resize(function (e) {
+            clearTimeout(resizeChart);
+            resizeChart = setTimeout(function () {
+                DrawSparkline();
+            }, 300);
+        });
+    });
+
+</script>
+
+<!-- Dashboard init -->
+<script src="{% static 'js/pages/dashboard-2.init.js' %}"></script>
+<!-- end demo js-->
+
+{% endblock %}

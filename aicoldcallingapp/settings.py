@@ -39,6 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'crispy_forms',
+    # 'allauth',
+    # 'allauth.account',
+    # 'allauth.socialaccount',
+    # 'django.contrib.sites', 
     
     'call_purpose.apps.CallPurposeConfig',
 
@@ -52,9 +57,18 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+]
+AUTHENTICATION_BACKENDS = [
+    'call_purpose.backends.EmailBackend',  # Replace 'myapp' with your app name
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
+
 ROOT_URLCONF = 'aicoldcallingapp.urls'
+LOGIN_URL = 'signin'
+LOGIN_REDIRECT_URL = '/'
+
 
 TEMPLATES = [
     {
@@ -121,6 +135,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR , 'static',]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
@@ -150,3 +165,5 @@ LOGGING = {
         'level': 'DEBUG',
     },
 }
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

@@ -1,0 +1,144 @@
+{% load static i18n %}
+
+{% if rtl %}
+  {% if demo == "creative" %}
+  <!-- App css -->
+  <link href="{% static 'css/config/creative/bootstrap-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-default-stylesheet" />
+  <link href="{% static 'css/config/creative/app-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-default-stylesheet" />
+  <link href="{% static 'css/config/creative/bootstrap-dark-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-dark-stylesheet" />
+  <link href="{% static 'css/config/creative/app-dark-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-dark-stylesheet" />
+ 
+  {% elif demo == "modern" %}
+  <!-- App css -->
+  <link href="{% static 'css/config/modern/bootstrap-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-default-stylesheet" />
+  <link href="{% static 'css/config/modern/app-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-default-stylesheet" />
+  <link href="{% static 'css/config/modern/bootstrap-dark-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-dark-stylesheet" />
+  <link href="{% static 'css/config/modern/app-dark-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-dark-stylesheet" />
+  
+  {% elif demo == "material" %}
+  <!-- App css -->
+  <link href="{% static 'css/config/material/bootstrap-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-default-stylesheet" />
+  <link href="{% static 'css/config/material/app-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-default-stylesheet" />
+  <link href="{% static 'css/config/material/bootstrap-dark-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-dark-stylesheet" />
+  <link href="{% static 'css/config/material/app-dark-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-dark-stylesheet" />
+  
+  {% elif demo == "purple" %}
+  <!-- App css -->
+  <link href="{% static 'css/config/purple/bootstrap-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-default-stylesheet" />
+  <link href="{% static 'css/config/purple/app-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-default-stylesheet" />
+  <link href="{% static 'css/config/purple/bootstrap-dark-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-dark-stylesheet" />
+  <link href="{% static 'css/config/purple/app-dark-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-dark-stylesheet" />
+  
+  {% elif demo == "saas" %}
+  <!-- App css -->
+  <link href="{% static 'css/config/saas/bootstrap-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-default-stylesheet" />
+  <link href="{% static 'css/config/saas/app-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-default-stylesheet" />
+  <link href="{% static 'css/config/saas/bootstrap-dark-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-dark-stylesheet" />
+  <link href="{% static 'css/config/saas/app-dark-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-dark-stylesheet" />
+
+  {% else %}
+  <!-- App css -->
+  <link href="{% static 'css/config/default/bootstrap-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-default-stylesheet" />
+  <link href="{% static 'css/config/default/app-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-default-stylesheet" />
+  <link href="{% static 'css/config/default/bootstrap-dark-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-dark-stylesheet" />
+  <link href="{% static 'css/config/default/app-dark-rtl.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-dark-stylesheet" />
+  {% endif %}
+{% else %}
+
+  {% if demo == "creative" %}
+  <!-- App css -->
+  <link href="{% static 'css/config/creative/bootstrap.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-default-stylesheet" />
+  <link href="{% static 'css/config/creative/app.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-default-stylesheet" />
+
+  <link href="{% static 'css/config/creative/bootstrap-dark.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-dark-stylesheet" />
+  <link href="{% static 'css/config/creative/app-dark.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-dark-stylesheet" />
+  
+  {% elif demo == "modern" %}
+  <!-- App css -->
+  <link href="{% static 'css/config/modern/bootstrap.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-default-stylesheet" />
+  <link href="{% static 'css/config/modern/app.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-default-stylesheet" />
+
+  <link href="{% static 'css/config/modern/bootstrap-dark.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-dark-stylesheet" />
+  <link href="{% static 'css/config/modern/app-dark.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-dark-stylesheet" />
+
+  {% elif demo == "material" %}
+  <!-- App css -->
+  <link href="{% static 'css/config/material/bootstrap.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-default-stylesheet" />
+  <link href="{% static 'css/config/material/app.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-default-stylesheet" />
+
+  <link href="{% static 'css/config/material/bootstrap-dark.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-dark-stylesheet" />
+  <link href="{% static 'css/config/material/app-dark.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-dark-stylesheet" />
+
+  {% elif demo == "purple" %}
+  <!-- App css -->
+  <link href="{% static 'css/config/purple/bootstrap.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-default-stylesheet" />
+  <link href="{% static 'css/config/purple/app.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-default-stylesheet" />
+
+  <link href="{% static 'css/config/purple/bootstrap-dark.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-dark-stylesheet" />
+  <link href="{% static 'css/config/purple/app-dark.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-dark-stylesheet" />
+
+  {% elif demo == "saas" %}
+  <!-- App css -->
+  <link href="{% static 'css/config/saas/bootstrap.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-default-stylesheet" />
+  <link href="{% static 'css/config/saas/app.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-default-stylesheet" />
+
+  <link href="{% static 'css/config/saas/bootstrap-dark.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-dark-stylesheet" />
+  <link href="{% static 'css/config/saas/app-dark.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-dark-stylesheet" />
+
+  {% else %}
+  <!-- App css -->
+  <link href="{% static 'css/config/default/bootstrap.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-default-stylesheet" />
+  <link href="{% static 'css/config/default/app.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-default-stylesheet" />
+
+  <link href="{% static 'css/config/default/bootstrap-dark.min.css' %}" rel="stylesheet" type="text/css"
+    id="bs-dark-stylesheet" />
+  <link href="{% static 'css/config/default/app-dark.min.css' %}" rel="stylesheet" type="text/css"
+    id="app-dark-stylesheet" />
+  {% endif %}
+{% endif %}

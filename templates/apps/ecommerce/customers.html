@@ -1,0 +1,178 @@
+{% extends "vertical_base.html" %} 
+{% load static i18n %} 
+{% block head_title%}{% trans "Customers" %}{% endblock head_title %}
+{% block extra_css %}
+
+<!-- third party css -->
+<link
+  href="{% static 'libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}"
+  rel="stylesheet"
+  type="text/css"
+/>
+<link
+  href="{% static 'libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}"
+  rel="stylesheet"
+  type="text/css"
+/>
+<!-- third party css end -->
+
+{% endblock %}
+ {% block content %}
+<!-- Start Content-->
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box">
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item">
+              <a href="javascript: void(0);">UBold</a>
+            </li>
+            <li class="breadcrumb-item">
+              <a href="javascript: void(0);">Ecommerce</a>
+            </li>
+            <li class="breadcrumb-item active">Customers</li>
+          </ol>
+        </div>
+        <h4 class="page-title">Customers</h4>
+      </div>
+    </div>
+  </div>
+  <!-- end page title -->
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="row mb-2">
+            <div class="col-sm-4">
+              <a href="javascript:void(0);" class="btn btn-danger mb-2"
+                ><i class="mdi mdi-plus-circle me-2"></i> Add Customers</a
+              >
+            </div>
+            <div class="col-sm-8">
+              <div class="text-sm-end">
+                <button type="button" class="btn btn-success mb-2 me-1">
+                  <i class="mdi mdi-cog"></i>
+                </button>
+                <button type="button" class="btn btn-light mb-2 me-1">
+                  Import
+                </button>
+                <button type="button" class="btn btn-light mb-2">Export</button>
+              </div>
+            </div>
+            <!-- end col-->
+          </div>
+
+          <div class="table-responsive">
+            <table
+              class="
+                table table-centered table-striped
+                dt-responsive
+                nowrap
+                w-100
+              "
+              id="products-datatable"
+            >
+              <thead>
+                <tr>
+                  <th style="width: 20px">
+                    <div class="form-check">
+                      <input
+                        type="checkbox"
+                        class="form-check-input"
+                        id="customCheck1"
+                      />
+                      <label class="form-check-label" for="customCheck1"
+                        >&nbsp;</label
+                      >
+                    </div>
+                  </th>
+                  <th>Customer</th>
+                  <th>Phone</th>
+                  <th>Balance</th>
+                  <th>Orders</th>
+                  <th>Last Order</th>
+                  <th>Status</th>
+                  <th style="width: 75px">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for data in customers %}
+                <tr>
+                  <td>
+                    <div class="form-check">
+                      <input
+                        type="checkbox"
+                        class="form-check-input"
+                        id="customCheck{{data.id}}"
+                      />
+                      <label
+                        class="form-check-label"
+                        for="customCheck{{data.id}}"
+                        >ABC</label
+                      >
+                    </div>
+                  </td>
+                  <td class="table-user">
+                    <img
+                      src="{{data.customer.avatar}}"
+                      alt="table-user"
+                      class="me-2 rounded-circle"
+                    />
+                    <a href="javascript:void(0);" class="text-body fw-semibold"
+                      >{{data.customer.name}}</a
+                    >
+                  </td>
+                  <td>{{data.phone}}</td>
+                  <td>{{data.balance}}</td>
+                  <td>{{data.orders}}</td>
+                  <td>
+                    {{data.lastOrder.date}}
+                    <small class="text-muted">{{data.lastOrder.time}}</small>
+                  </td>
+                  <td>
+                    <span class="badge badge-soft-{{data.status.color}}"
+                      >{{data.status.name}}</span
+                    >
+                  </td>
+
+                  <td>
+                    <a href="javascript:void(0);" class="action-icon">
+                      <i class="mdi mdi-square-edit-outline"></i
+                    ></a>
+                    <a href="javascript:void(0);" class="action-icon">
+                      <i class="mdi mdi-delete"></i
+                    ></a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- end card-body-->
+      </div>
+      <!-- end card-->
+    </div>
+    <!-- end col -->
+  </div>
+  <!-- end row -->
+</div>
+<!-- container -->
+{% endblock %} {% block extra_javascript %}
+
+<!-- Third party js -->
+<script src="{% static 'libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+<script src="{% static 'libs/jquery-datatables-checkboxes/js/dataTables.checkboxes.min.js' %}"></script>
+<!-- Third party js ends -->
+
+<!-- Init js -->
+<script src="{% static 'js/pages/customers.init.js' %}"></script>
+<!-- Init js end -->
+
+{% endblock %}

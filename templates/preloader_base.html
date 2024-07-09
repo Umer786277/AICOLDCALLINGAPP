@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block page_content %}
+
+
+<!-- Pre-loader -->
+<div id="preloader">
+    <div id="status">
+        <div class="spinner">Loading...</div>
+    </div>
+</div>
+<!-- End Preloader-->
+
+
+<!-- Begin page -->
+<div id="wrapper">
+
+    {% block topbar %}
+    {% include 'partials/topbar.html' %}
+    {% endblock %}
+
+
+    {% block left_sidebar %}
+    {% include 'partials/left-sidebar.html' %}
+    {% endblock %}
+
+    <!-- ============================================================== -->
+    <!-- Start Page Content here -->
+    <!-- ============================================================== -->
+    <div class="content-page">
+        <div class="content">
+
+            {% block content %}
+
+            {% endblock %}
+
+        </div>
+        <!-- content -->
+
+        {% block footer %}
+        {% include 'partials/footer.html' %}
+        {% endblock %}
+
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- End Page content -->
+    <!-- ============================================================== -->
+
+</div>
+<!-- END wrapper -->
+
+{% block right_sidebar %}
+{% include 'partials/right-sidebar.html' %}
+{% endblock %}
+
+{% endblock %}
+
+{% block extra_javascript %}{% endblock %}
+
+{% block extra_javascript_bottom %}{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "vertical_base.html" %}
+{% load static %}
+
+{% block page_content %}
+<div class="container-fluid" style="background-color: gray;">
+    <div class="row justify-content-center">
+        <div class="col-4 col-md-8 col-lg-4 mt-5">
+            <div class="card shadow" style="background-color: lightgray;">
+                <div class="card-body">
+                    <h2 class="text-center mb-4">Define Call Purpose</h2>
+                    <form method="post" action="{% url 'define-call-purpose' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="goal" class="form-label">Goal</label>
+                            <input type="text" class="form-control" id="goal" name="goal" placeholder="Enter the goal of the call" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="lead" class="form-label">Lead</label>
+                            <input type="text" class="form-control" id="lead" name="lead" placeholder="Enter the lead's name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="number_to_call" class="form-label">Number to Call</label>
+                            <input type="text" class="form-control" id="number_to_call" name="number_to_call" placeholder="Enter the phone number to call" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="name_of_phone" class="form-label">Name of Phone</label>
+                            <input type="text" class="form-control" id="name_of_phone" name="name_of_phone" placeholder="Enter the name of the phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="name_of_company" class="form-label">Name of Company</label>
+                            <input type="text" class="form-control" id="name_of_company" name="name_of_company" placeholder="Enter the company name" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100" style="background-color: blue;">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if call_purpose %}
+        <div class="row justify-content-center mt-5">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="card shadow">
+                    <div class="card-header">
+                        <h3 class="card-title text-center">Call Purpose</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>{{ call_purpose }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if error %}
+        <div class="row justify-content-center mt-5">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="alert alert-danger">
+                    <strong>Error:</strong> {{ error }}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block extra_css %}{% endblock %}
+
+{% block body_extra %}
+
+{% if dark %}
+class="loading" data-layout-mode="detached" data-layout='{"mode": "dark", "width": "fluid", "menuPosition": "fixed",
+"sidebar": { "color": "dark", "size": "default", "showuser": true}, "topbar": {"color": "dark"},
+"showRightSidebarOnPageLoad": true}'
+{% else %}
+class="loading" data-layout-mode="detached" data-layout='{"mode": "light", "width": "fluid", "menuPosition": "fixed",
+"sidebar": { "color": "light", "size": "default", "showuser": true}, "topbar": {"color": "dark"},
+"showRightSidebarOnPageLoad": true}'
+{% endif %}
+
+{% endblock %}
+
+
+{% block page_content %}
+
+<!-- Begin page -->
+<div id="wrapper">
+
+    {% block topbar %}
+    {% include 'partials/topbar.html' %}
+    {% endblock %}
+
+
+    {% block left_sidebar %}
+    {% include 'partials/left-sidebar.html' %}
+    {% endblock %}
+
+    <!-- ============================================================== -->
+    <!-- Start Page Content here -->
+    <!-- ============================================================== -->
+    <div class="content-page">
+        <div class="content">
+
+            {% block content %}
+
+            {% endblock %}
+
+        </div>
+        <!-- content -->
+
+        {% block footer %}
+        {% include 'partials/footer.html' %}
+        {% endblock %}
+
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- End Page content -->
+    <!-- ============================================================== -->
+
+</div>
+<!-- END wrapper -->
+
+{% endblock %}
+
+{% block right_sidebar %}
+{% include 'partials/right-sidebar.html' %}
+{% endblock %}
+
+
+{% block extra_javascript %}{% endblock %}
+
+{% block extra_javascript_bottom %}{% endblock %}

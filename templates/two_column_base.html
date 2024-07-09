@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+
+{% block extra_css %}{% endblock %}
+
+{% block body_extra %}
+{% if dark %}
+class="loading" data-layout-mode="two-column" data-layout='{"mode": "dark", "width": "fluid", "menuPosition": "fixed",
+"sidebar": { "color": "dark", "size": "default", "showuser": false}, "topbar": {"color": "light"},
+"showRightSidebarOnPageLoad": true}'
+{% else %}
+class="loading" data-layout-mode="two-column" data-layout='{"mode": "light", "width": "fluid", "menuPosition": "fixed",
+"sidebar": { "color": "light", "size": "default", "showuser": false}, "topbar": {"color": "light"},
+"showRightSidebarOnPageLoad": true}'
+{% endif %}
+{% endblock %}
+
+
+{% block page_content %}
+
+<!-- Begin page -->
+<div id="wrapper">
+
+    {% block topbar %}
+    {% include 'partials/topbar.html' %}
+    {% endblock %}
+
+
+    {% block left_sidebar %}
+    {% include 'partials/two-column-sidebar.html' %}
+    {% endblock %}
+
+    <!-- ============================================================== -->
+    <!-- Start Page Content here -->
+    <!-- ============================================================== -->
+    <div class="content-page">
+        <div class="content">
+
+            {% block content %}
+
+            {% endblock %}
+
+        </div>
+        <!-- content -->
+
+        {% block footer %}
+        {% include 'partials/footer.html' %}
+        {% endblock %}
+
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- End Page content -->
+    <!-- ============================================================== -->
+</div>
+<!-- END wrapper -->
+
+<!-- Block Right Sidebar -->
+{% block right_sidebar %}
+{% include 'partials/right-sidebar.html' %}
+{% endblock %}
+
+{% endblock %}
+
+
+{% block extra_javascript %}{% endblock %}
+
+{% block extra_javascript_bottom %}{% endblock %}

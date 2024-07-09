@@ -4,9 +4,11 @@ from django.db import models
 import os
 import json
 
-class CustomUser(AbstractUser):
-    # Define any additional fields for your user model if necessary
 
+
+class CustomUser(AbstractUser):
+    # email = models.EmailField(unique=True)
+    
     # Define unique related_name for groups field to avoid clash
     groups = models.ManyToManyField(
         'auth.Group',
@@ -26,7 +28,6 @@ class CustomUser(AbstractUser):
     )
 
     def create_user_folders(self):
-        # Define folder paths based on user's ID
         user_folder = os.path.join('user_data', str(self.id))
         os.makedirs(user_folder, exist_ok=True)  # Create user's main folder if it doesn't exist
 
@@ -43,6 +44,7 @@ class CustomUser(AbstractUser):
         user_data_file = os.path.join(user_data_folder, 'user_data.json')
         with open(user_data_file, 'w') as file:
             json.dump(data, file)
+
 
 
 
@@ -77,3 +79,13 @@ class CallSummary(models.Model):
 
     def __str__(self):
         return f'Summary for {self.call.call_id}'
+
+
+class Lead(models.Model):
+    name = models.CharField(max_length=100)
+    contact_information = models.CharField(max_length=200)
+    industry = models.CharField(max_length=100)
+    location = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name

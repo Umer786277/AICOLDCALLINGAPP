@@ -1,0 +1,362 @@
+{% extends "vertical_base.html" %}
+{% load static i18n %}
+
+{% block head_title %}{% trans "Dashboard 4" %}{% endblock head_title %}
+
+
+{% block content %}
+<!-- Start Content-->
+<div class="container-fluid">
+
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">UBold</a></li>
+                        <li class="breadcrumb-item active">Dashboard 4</li>
+                    </ol>
+                </div>
+                <h4 class="page-title">Dashboard 4</h4>
+            </div>
+        </div>
+    </div>
+    <!-- end page title -->
+
+
+    <div class="row">
+        <div class="col-xl-4 col-md-6">
+            <!-- Portlet card -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-widgets">
+                        <a href="javascript: void(0);" data-toggle="reload"><i class="mdi mdi-refresh"></i></a>
+                        <a data-bs-toggle="collapse" href="#cardCollpase1" role="button" aria-expanded="false"
+                            aria-controls="cardCollpase1"><i class="mdi mdi-minus"></i></a>
+                        <a href="javascript: void(0);" data-toggle="remove"><i class="mdi mdi-close"></i></a>
+                    </div>
+                    <h4 class="header-title mb-0">Lifetime Sales</h4>
+
+                    <div id="cardCollpase1" class="collapse pt-3 show">
+                        <div class="text-center">
+                            <div class="row mt-2">
+                                <div class="col-4">
+                                    <h3 data-plugin="counterup">{{lifetimeSalesStat.total_sales}}</h3>
+                                    <p class="text-muted font-13 mb-0 text-truncate">Total Sales</p>
+                                </div>
+                                <div class="col-4">
+                                    <h3 data-plugin="counterup">{{lifetimeSalesStat.open_campaign}}</h3>
+                                    <p class="text-muted font-13 mb-0 text-truncate">Open Campaign</p>
+                                </div>
+                                <div class="col-4">
+                                    <h3 data-plugin="counterup">{{lifetimeSalesStat.daily_sales}}</h3>
+                                    <p class="text-muted font-13 mb-0 text-truncate">Daily Sales</p>
+                                </div>
+                            </div> <!-- end row -->
+
+                            <div dir="ltr">
+                                <div id="lifetime-sales" data-colors="#4fc6e1,#6658dd,#ebeff2" style="height: 270px;"
+                                    class="morris-chart mt-3"></div>
+                            </div>
+                        </div>
+                    </div> <!-- end collapse-->
+                </div> <!-- end card-body-->
+            </div> <!-- end card-->
+        </div> <!-- end col-->
+
+        <div class="col-xl-4 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-widgets">
+                        <a href="javascript: void(0);" data-toggle="reload"><i class="mdi mdi-refresh"></i></a>
+                        <a data-bs-toggle="collapse" href="#cardCollpase3" role="button" aria-expanded="false"
+                            aria-controls="cardCollpase3"><i class="mdi mdi-minus"></i></a>
+                        <a href="javascript: void(0);" data-toggle="remove"><i class="mdi mdi-close"></i></a>
+                    </div>
+                    <h4 class="header-title mb-0">Statistics</h4>
+
+                    <div id="cardCollpase3" class="collapse pt-3 show">
+                        <div class="text-center">
+
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <h3 data-plugin="counterup">{{dashboard4BarChartStat.total_sales}}</h3>
+                                    <p class="text-muted font-13 mb-0 text-truncate">Total Sales</p>
+                                </div>
+                                <div class="col-6">
+                                    <h3 data-plugin="counterup">{{dashboard4BarChartStat.open_campaign}}</h3>
+                                    <p class="text-muted font-13 mb-0 text-truncate">Open Campaign</p>
+                                </div>
+                            </div> <!-- end row -->
+
+                            <div dir="ltr">
+                                <div id="statistics-chart" data-colors="#02c0ce" style="height: 270px;"
+                                    class="morris-chart mt-3"></div>
+                            </div>
+
+                        </div>
+                    </div> <!-- end collapse-->
+                </div> <!-- end card-body-->
+            </div> <!-- end card-->
+        </div> <!-- end col-->
+
+        <div class="col-xl-4 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-widgets">
+                        <a href="javascript: void(0);" data-toggle="reload"><i class="mdi mdi-refresh"></i></a>
+                        <a data-bs-toggle="collapse" href="#cardCollpase2" role="button" aria-expanded="false"
+                            aria-controls="cardCollpase2"><i class="mdi mdi-minus"></i></a>
+                        <a href="javascript: void(0);" data-toggle="remove"><i class="mdi mdi-close"></i></a>
+                    </div>
+                    <h4 class="header-title mb-0">Income Amounts</h4>
+
+                    <div id="cardCollpase2" class="collapse pt-3 show">
+                        <div class="text-center">
+                            <div class="row mt-2">
+                                <div class="col-4">
+                                    <h3 data-plugin="counterup">{{incomeAmountsStat.total_sales}}</h3>
+                                    <p class="text-muted font-13 mb-0 text-truncate">Total Sales</p>
+                                </div>
+                                <div class="col-4">
+                                    <h3 data-plugin="counterup">{{incomeAmountsStat.open_campaign}}</h3>
+                                    <p class="text-muted font-13 mb-0 text-truncate">Open Campaign</p>
+                                </div>
+                                <div class="col-4">
+                                    <h3 data-plugin="counterup">{{incomeAmountsStat.daily_sales}}</h3>
+                                    <p class="text-muted font-13 mb-0 text-truncate">Daily Sales</p>
+                                </div>
+                            </div> <!-- end row -->
+
+                            <div dir="ltr">
+                                <div id="income-amounts" data-colors="#4a81d4,#e3eaef" style="height: 270px;"
+                                    class="morris-chart mt-3"></div>
+                            </div>
+
+                        </div>
+                    </div> <!-- end collapse-->
+                </div> <!-- end card-body-->
+            </div> <!-- end card-->
+        </div> <!-- end col-->
+    </div>
+    <!-- end row -->
+
+
+    <div class="row">
+        {% for user in showcaseUsers%}
+        <div class="col-md-6 col-xl-3">
+            <div class="widget-rounded-circle card {% if user.isPremiumUser %}bg-blue{% endif %}">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="avatar-lg">
+                                <img src="{{user.avatar}}"
+                                    class="img-fluid rounded-circle {% if user.isPremiumUser %}img-thumbnail{% endif %}"
+                                    alt="user-img">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h5 class="mb-1 mt-2 font-16 {% if user.isPremiumUser %}text-light {% endif %}">
+                                {{user.name}}</h5>
+                            <p class="mb-2 {% if user.isPremiumUser %}text-light{% else %}text-muted{% endif %}">
+                                {{user.role}}</p>
+                        </div>
+                    </div> <!-- end row-->
+                </div>
+            </div> <!-- end widget-rounded-circle-->
+        </div> <!-- end col-->
+        {% endfor %}
+    </div>
+    <!-- end row -->
+
+    <div class="row">
+        <div class="col-12">
+            <!-- Portlet card -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-widgets">
+                        <a href="javascript: void(0);" data-toggle="reload"><i class="mdi mdi-refresh"></i></a>
+                        <a data-bs-toggle="collapse" href="#cardCollpase4" role="button" aria-expanded="false"
+                            aria-controls="cardCollpase4"><i class="mdi mdi-minus"></i></a>
+                        <a href="javascript: void(0);" data-toggle="remove"><i class="mdi mdi-close"></i></a>
+                    </div>
+                    <h4 class="header-title mb-0">Projects</h4>
+
+                    <div id="cardCollpase4" class="collapse pt-3 show">
+                        <div class="table-responsive">
+                            <table class="table table-centered table-nowrap table-borderless mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Project Name</th>
+                                        <th>Start Date</th>
+                                        <th>Due Date</th>
+                                        <th>Team</th>
+                                        <th>Status</th>
+                                        <th>Clients</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for recoard in projects %}
+                                    <tr>
+                                        <td>{{recoard.ProjectName}}</td>
+                                        <td>{{recoard.StartDate}}</td>
+                                        <td>{{recoard.DueDate}}</td>
+                                        <td id="tooltip-container">
+                                            <div class="avatar-group">
+                                                {% for member in recoard.Team %}
+                                                <a href="javascript: void(0);" class="avatar-group-item"
+                                                    data-bs-container="#tooltip-container" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" title="{{member.name}}">
+                                                    <img src="{{member.avatar}}" class="rounded-circle avatar-xs"
+                                                        alt="friend">
+                                                </a>
+                                                {% endfor %}
+
+                                            </div>
+                                        </td>
+                                        <td><span
+                                                class="badge bg-soft-{{recoard.Status.color}} text-{{recoard.Status.color}} p-1">{{recoard.Status.name}}</span>
+                                        </td>
+                                        <td>{{recoard.Clients}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div> <!-- .table-responsive -->
+                    </div> <!-- end collapse-->
+                </div> <!-- end card-body-->
+            </div> <!-- end card-->
+        </div> <!-- end col-->
+    </div>
+    <!-- end row -->
+
+</div> <!-- container -->
+{% endblock %}
+
+{% block extra_javascript %}
+
+<!-- Third party js -->
+<script src="{% static 'libs/morris.js06/morris.min.js' %}"></script>
+<script src="{% static 'libs/raphael/raphael.min.js' %}"></script>
+<!-- Third party js ends -->
+
+<script type="text/javascript">
+    var lifetimeSalesDonutTotalSales = {{ lifetimeSalesDonut.total_sales }}
+    var lifetimeSalesDonutCampaignSend = {{ lifetimeSalesDonut.campaign_Send }}
+    var lifetimeSalesDonutDailySales = {{ lifetimeSalesDonut.daily_sales }}
+    var dashboard4BarChartData = JSON.parse("{{dashboard4BarChart|escapejs}}");
+    var incomeAmountsChartData = JSON.parse("{{incomeAmountsChart|escapejs}}");
+
+    !(function (e) {
+        "use strict";
+        var a = function () { };
+        (a.prototype.createBarChart = function (a, t, e, o, r, i) {
+            Morris.Bar({
+                element: a,
+                data: t,
+                xkey: e,
+                ykeys: o,
+                labels: r,
+                dataLabels: !1,
+                hideHover: "auto",
+                resize: !0,
+                gridLineColor: "rgba(65, 80, 95, 0.07)",
+                barSizeRatio: 0.2,
+                barColors: i,
+            });
+        }),
+            (a.prototype.createAreaChartDotted = function (
+                a,
+                t,
+                e,
+                o,
+                r,
+                i,
+                s,
+                l,
+                n,
+                c
+            ) {
+                Morris.Area({
+                    element: a,
+                    pointSize: 3,
+                    lineWidth: 1,
+                    data: o,
+                    xkey: r,
+                    ykeys: i,
+                    labels: s,
+                    dataLabels: !1,
+                    hideHover: "auto",
+                    pointFillColors: l,
+                    pointStrokeColors: n,
+                    resize: !0,
+                    smooth: !1,
+                    gridLineColor: "rgba(65, 80, 95, 0.07)",
+                    lineColors: c,
+                });
+            }),
+            (a.prototype.createDonutChart = function (a, t, e) {
+                Morris.Donut({
+                    element: a,
+                    data: t,
+                    barSize: 0.2,
+                    resize: !0,
+                    colors: e,
+                    backgroundColor: "transparent",
+                });
+            }),
+            (a.prototype.init = function () {
+                var a = ["#02c0ce"];
+                (t = e("#statistics-chart").data("colors")) && (a = t.split(",")),
+                    this.createBarChart(
+                        "statistics-chart",
+                        dashboard4BarChartData,
+                        "y",
+                        ["a"],
+                        ["Statistics"],
+                        a
+                    );
+                a = ["#4a81d4", "#e3eaef"];
+                (t = e("#income-amounts").data("colors")) && (a = t.split(",")),
+                    this.createAreaChartDotted(
+                        "income-amounts",
+                        0,
+                        0,
+                        incomeAmountsChartData,
+                        "y",
+                        ["a", "b"],
+                        ["Bitcoin", "Litecoin"],
+                        ["#ffffff"],
+                        ["#999999"],
+                        a
+                    );
+                var t;
+                a = ["#4fc6e1", "#6658dd", "#ebeff2"];
+                (t = e("#lifetime-sales").data("colors")) && (a = t.split(",")),
+                    this.createDonutChart(
+                        "lifetime-sales",
+                        [
+                            { label: " Total Sales ", value: lifetimeSalesDonutTotalSales },
+                            { label: " Campaign Send", value: lifetimeSalesDonutCampaignSend },
+                            { label: " Daily Sales ", value: lifetimeSalesDonutDailySales },
+                        ],
+                        a
+                    );
+            }),
+            (e.Dashboard4 = new a()),
+            (e.Dashboard4.Constructor = a);
+    })(window.jQuery),
+        (function (a) {
+            "use strict";
+            window.jQuery.Dashboard4.init();
+        })();
+
+
+</script>
+
+<!-- Dashboard init -->
+<script src="{% static 'js/pages/dashboard-4.init.js' %}"></script>
+<!-- end demo js-->
+
+{% endblock %}
