@@ -1,0 +1,123 @@
+{% extends "vertical_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+
+
+<style>
+    .content {
+        flex: 1;
+        padding: 40px;
+        margin-left: 250px; /* Adjust for drawer width */
+        background-color: #ffffff; /* White background for content area */
+        overflow-y: auto;
+    }
+    .heading {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #004085; /* Dark blue color for heading */
+    }
+    .dropdown {
+        display: none;
+        flex-direction: column;
+        padding-left: 10px;
+    }
+    .dropdown a {
+        margin-bottom: 5px;
+        padding-left: 20px;
+        background-color: #e9f7fc; /* Very light blue background for dropdown items */
+        border-left: 3px solid #004085; /* Blue left border for dropdown items */
+    }
+    .drawer .dropdown-btn {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #e9f7fc; /* Very light blue background for dropdown button */
+    }
+    .drawer .dropdown-btn::after {
+        content: '▼';
+        font-size: 12px;
+        margin-left: auto;
+        transition: transform 0.3s;
+    }
+    .drawer .dropdown-btn.active::after {
+        transform: rotate(-180deg);
+    }
+    table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd; /* Light grey border */
+    }
+    th {
+        background-color: #004085; /* Dark blue background for table header */
+        color: #fff; /* White text color */
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    tr:nth-child(even) {
+        background-color: #f2f2f2; /* Light grey background for even rows */
+    }
+    tr:hover {
+        background-color: #e9f7fc; /* Very light blue background for hover effect */
+    }
+
+   
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="content">
+    <h1>All Leads</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Link</th>
+                <th>Brand Summary</th>
+                <th>SEO Score</th>
+                <th>Tech Stacks</th>
+                <th>Traffic Analysis</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lead in leads %}
+            <tr>
+                <td>{{ lead.link }}</td>
+                <td>{{ lead.brand_summary }}</td>
+                <td>{{ lead.seo_score }}</td>
+                <td>{{ lead.tech_stacks }}</td>
+                <td>{{ lead.traffic_analysis }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+
+
+{% block extra_javascript %}
+
+<script>
+    function toggleDropdown(id) {
+        var dropdown = document.getElementById(id);
+        var dropdownBtn = document.getElementById(id + 'Btn');
+        if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+            dropdown.style.display = 'block';
+            dropdownBtn.classList.add('active');
+        } else {
+            dropdown.style.display = 'none';
+            dropdownBtn.classList.remove('active');
+        }
+    }
+</script>
+
+{% endblock %}

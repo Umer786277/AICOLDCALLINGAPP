@@ -1,0 +1,76 @@
+{% extends "vertical_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+
+<style>
+
+    .content {
+        flex: 1;
+        padding: 40px;
+        background-color: #ffffff;
+        /* White background for content area */
+        overflow-y: auto;
+        margin-left: 250px;
+    }
+    
+</style>
+
+    <script>
+        function toggleDropdown(id) {
+            var dropdown = document.getElementById(id);
+            var dropdownBtn = document.getElementById(id + 'Btn');
+            if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+                dropdown.style.display = 'flex';
+                dropdownBtn.classList.add('active');
+            } else {
+                dropdown.style.display = 'none';
+                dropdownBtn.classList.remove('active');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize all dropdowns to be hidden
+            var dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach(function (dropdown) {
+                dropdown.style.display = 'none';
+            });
+        });
+
+        function showLoadingMessage() {
+            var loadingMessage = document.getElementById('loadingMessage');
+            loadingMessage.style.display = 'block';
+        }
+    </script>
+
+
+{% endblock %}
+
+{% block content %}
+
+><div class="content">
+    <h1>Find Leads</h1>
+    <form id="findLeadsForm" method="get">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Search query" id="searchQuery" name="query"
+                value="{{ query }}">
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+    </form>
+    <div id="leadsList">
+        {% for lead in leads %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ lead.name }}</h5>
+                <p class="card-text">Contact Number: {{ lead.contact_no }}</p>
+                <p class="card-text">Industry: {{ lead.industry }}</p>
+                <p class="card-text">Location: {{ lead.location }}</p>
+                <p class="card-text">Notes: {{ lead.notes }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+{% endblock content %}

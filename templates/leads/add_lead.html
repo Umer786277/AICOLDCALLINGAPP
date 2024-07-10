@@ -1,0 +1,86 @@
+{% extends "vertical_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+
+<style>
+
+    .content {
+        flex: 1;
+        padding: 40px;
+        background-color: #ffffff; /* White background for content area */
+        overflow-y: auto;
+    }
+
+    
+</style>
+
+
+<script>
+    function toggleDropdown(id) {
+        var dropdown = document.getElementById(id);
+        var dropdownBtn = document.getElementById(id + 'Btn');
+        if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+            dropdown.style.display = 'flex';
+            dropdownBtn.classList.add('active');
+        } else {
+            dropdown.style.display = 'none';
+            dropdownBtn.classList.remove('active');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize all dropdowns to be hidden
+        var dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(function (dropdown) {
+            dropdown.style.display = 'none';
+        });
+    });
+
+    function hideMessage() {
+        var message = document.getElementById('successMessage');
+        if (message) {
+            setTimeout(function() {
+                message.style.display = 'none';
+            }, 10000);  // 10000 milliseconds = 10 seconds
+        }
+    }
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="content">
+    <h1>Add Lead</h1>
+    {% if success_message %}
+    <p id="successMessage" style="color: green;">{{ success_message }} {{ name }}</p>
+    {% endif %}
+    <form method="post" action="{% url 'add-lead' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="mb-3">
+            <label for="contact_no" class="form-label">Contact Number</label>
+            <input type="text" class="form-control" id="contact_no" name="contact_no" required>
+        </div>
+        <div class="mb-3">
+            <label for="industry" class="form-label">Industry</label>
+            <input type="text" class="form-control" id="industry" name="industry" required>
+        </div>
+        <div class="mb-3">
+            <label for="location" class="form-label">Location</label>
+            <input type="text" class="form-control" id="location" name="location" required>
+        </div>
+        <div class="mb-3">
+            <label for="notes" class="form-label">Notes</label>
+            <input type="text" class="form-control" id="notes" name="notes" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Lead</button>
+    </form>
+</div>
+
+
+{% endblock content %}

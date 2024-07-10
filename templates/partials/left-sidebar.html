@@ -128,26 +128,24 @@
         <li>
           <a href="#sidebarCrm" data-bs-toggle="collapse">
             <i data-feather="users"></i>
-            <span> CRM </span>
+            <span> Leads Management </span>
             <span class="menu-arrow"></span>
           </a>
           <div class="collapse" id="sidebarCrm">
             <ul class="nav-second-level">
               <li>
-                <a href="#">Dashboard</a>
+                <a href="{% url 'generate-shopifystoresdetail' %}">Gnerate Leads</a>
               </li>
               <li>
-                <a href="#">Contacts</a>
+                <a href="{% url 'all-leads' %}">Show Leads</a>
               </li>
               <li>
-                <a href="#">Opportunities</a>
+                <a href="{% url 'add-lead' %}">Add Leads</a>
               </li>
               <li>
-                <a href="#">Leads</a>
+                <a href="{% url 'find-leads' %}">Find Lead</a>
               </li>
-              <li>
-                <a href="#">Customers</a>
-              </li>
+             
             </ul>
           </div>
         </li>
@@ -690,155 +688,10 @@
 <!-- Start Page Content here -->
 <!-- ============================================================== -->
 
-<div class="content-page">
-  <div class="content">
-    <!-- Start Content-->
-    <div class="container-fluid">
-      <!-- start page title -->
-      <div class="row">
-        <div class="col-12">
-          <div class="page-title-box">
-            <div class="page-title-right">
-              <ol class="breadcrumb m-0">
-                <li class="breadcrumb-item">
-                  <a href="javascript: void(0);">Xeria</a>
-                </li>
-                <li class="breadcrumb-item">
-                  <a href="javascript: void(0);">CRM</a>
-                </li>
-                <li class="breadcrumb-item active">Dashboard</li>
-              </ol>
-            </div>
-            <h4 class="page-title">Dashboard</h4>
-          </div>
-        </div>
-      </div>
+      
       <!-- end page title -->
 
-      <!-- content -->
-      <div class="row">
-        <div class="col-xl-4 col-lg-6">
-          <div class="card">
-            <div class="card-body">
-              <div class="dropdown float-end">
-                <a
-                  href="#"
-                  class="dropdown-toggle arrow-none card-drop"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <i class="mdi mdi-dots-vertical"></i>
-                </a>
-                <div class="dropdown-menu dropdown-menu-end">
-                  <!-- item-->
-                  <a href="javascript:void(0);" class="dropdown-item">Edit</a>
-                  <!-- item-->
-                  <a href="javascript:void(0);" class="dropdown-item"
-                    >Delete</a
-                  >
-                  <!-- item-->
-                  <a href="javascript:void(0);" class="dropdown-item">Download</a>
-                </div>
-              </div>
-
-              <h4 class="header-title mt-0 mb-4">Total Revenue</h4>
-
-              <div
-                class="widget-chart-1"
-                dir="ltr"
-              >
-                <div
-                  id="total-revenue"
-                  class="apex-charts"
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-4 col-lg-6">
-          <div class="card">
-            <div class="card-body">
-              <div class="dropdown float-end">
-                <a
-                  href="#"
-                  class="dropdown-toggle arrow-none card-drop"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <i class="mdi mdi-dots-vertical"></i>
-                </a>
-                <div class="dropdown-menu dropdown-menu-end">
-                  <!-- item-->
-                  <a href="javascript:void(0);" class="dropdown-item">Edit</a>
-                  <!-- item-->
-                  <a href="javascript:void(0);" class="dropdown-item"
-                    >Delete</a
-                  >
-                  <!-- item-->
-                  <a href="javascript:void(0);" class="dropdown-item">Download</a>
-                </div>
-              </div>
-
-              <h4 class="header-title mt-0 mb-4">Total Customers</h4>
-
-              <div
-                class="widget-chart-1"
-                dir="ltr"
-              >
-                <div
-                  id="total-customers"
-                  class="apex-charts"
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-4 col-lg-6">
-          <div class="card">
-            <div class="card-body">
-              <div class="dropdown float-end">
-                <a
-                  href="#"
-                  class="dropdown-toggle arrow-none card-drop"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <i class="mdi mdi-dots-vertical"></i>
-                </a>
-                <div class="dropdown-menu dropdown-menu-end">
-                  <!-- item-->
-                  <a href="javascript:void(0);" class="dropdown-item">Edit</a>
-                  <!-- item-->
-                  <a href="javascript:void(0);" class="dropdown-item"
-                    >Delete</a
-                  >
-                  <!-- item-->
-                  <a href="javascript:void(0);" class="dropdown-item">Download</a>
-                </div>
-              </div>
-
-              <h4 class="header-title mt-0 mb-4">Total Expenses</h4>
-
-              <div
-                class="widget-chart-1"
-                dir="ltr"
-              >
-                <div
-                  id="total-expenses"
-                  class="apex-charts"
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- end row -->
-    </div>
-    <!-- container-fluid -->
-  </div>
-  <!-- content -->
-
+     
   <!-- Footer Start -->
   <footer class="footer">
     <div class="container-fluid">

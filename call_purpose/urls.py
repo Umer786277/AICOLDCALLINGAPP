@@ -12,13 +12,15 @@ urlpatterns = [
     # path('api/signup/', SignupView.as_view(), name='api-signup'),
     path('signup/', views.signup, name='signup-page'),
     path('signin/', views.signin, name='signin'),
-    # path('signin/', views.signin_page, name='signin'),
-
+    
     path('logout/', views.logout_request, name='logout'),
-   
     path('call/', views.create_call, name='call'),
-#     path('generate-call-summary/<str:call_id>/',views.get_call_summary, name='generate_call_summary'),
-#     path('send-to-llm/', views.send_to_llm, name='send_to_llm'),
+    path('generate_shopifystoresdetail/', views.generate_shopifystoresdetail, name='generate-shopifystoresdetail'),
+    path('show-leads/', views.show_leads, name='all-leads'),
+    path('lead/add/', views.add_lead, name='add-lead'),
+    path('lead/<int:id>/',views.get_or_update_lead, name='get-or-update-lead'),
+    path('lead/find/', views.find_leads, name='find-leads'),
+    path('lead/<int:id>/add_notes/',views.add_notes, name='add-notes'),
 ]
 
 

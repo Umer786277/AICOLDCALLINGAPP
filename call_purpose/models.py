@@ -82,10 +82,34 @@ class CallSummary(models.Model):
 
 
 class Lead(models.Model):
-    name = models.CharField(max_length=100)
-    contact_information = models.CharField(max_length=200)
-    industry = models.CharField(max_length=100)
-    location = models.CharField(max_length=100)
+    user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
+    name = models.CharField(max_length=200)
+    contact_no = models.TextField()
+    industry = models.CharField(max_length=200)
+    location = models.CharField(max_length=200)
+    notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name
+
+
+
+class ShopifyStoresDetails(models.Model):
+    lead = models.ForeignKey(Lead,on_delete=models.CASCADE)
+    link = models.URLField()
+    brand_summary = models.TextField()
+    traffic_analysis = models.TextField()
+    seo_score = models.TextField()
+    tech_stacks = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    business_description = models.TextField(blank=True)
+    industry = models.CharField(max_length=100, blank=True)
+    location = models.CharField(max_length=100, blank=True)
+
+    def __str__(self):
+        return f'{self.user.username} Profile'

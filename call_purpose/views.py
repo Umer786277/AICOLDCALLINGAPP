@@ -10,6 +10,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
@@ -21,11 +22,13 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status, generics
-from .models import Lead, CustomUser, Company, Call, CallSummary
+from .models import *
 from .serializers import CallPurposeSerializer, CompanySerializer
 from .forms import CallForm, CallPurposeForm
 from firecrawl import FirecrawlApp
 from groq import Groq
+import time
+from .utils import *
 
 
 google_api_key = os.getenv('GOOGLE_API_KEY')
@@ -34,11 +37,8 @@ firecrawl_api_key = os.getenv('FIRECRAWL_API_KEY')
 builtwith_api_key = os.getenv('BUILTWITH_API_KEY')
 backlink_api_key = os.getenv('BACKLINK_API_KEY')
 similarweb_api_key = os.getenv('SIMILARWEB_API_KEY')
-groq_api_key  ="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"
 moz_access_id = os.getenv('MOZ_ACCESS_ID')
 moz_secret_key = os.getenv('MOZ_SECRET_KEY')
-
-
 
 CustomUser = get_user_model()
 logger = logging.getLogger(__name__)
@@ -164,24 +164,80 @@ def check_lead(summary):
 
 
 
+
+def show_leads(request):
+    leads = ShopifyStoresDetails.objects.all()
+    return render(request, 'leads/show_leads.html', {'leads': leads})
+
+@login_required
 @csrf_exempt
 def add_lead(request):
     if request.method == 'POST':
         name = request.POST.get('name')
-        contact_information = request.POST.get('contact_info')
+        contact_no = request.POST.get('contact_no')
         industry = request.POST.get('industry')
         location = request.POST.get('location')
+        notes = request.POST.get('notes')
 
-        if name and contact_information and industry and location:
-            lead = Lead.objects.create(
-                name=name,
-                contact_information=contact_information,
-                industry=industry,
-                location=location
-            )
-            return JsonResponse({'id': lead.id, 'status': 'Lead added'}, status=201)
-        return JsonResponse({'error': 'Invalid input'}, status=400)
-    return HttpResponse(status=405)
+        if not (name and contact_no and industry and location):
+            return JsonResponse({'error': 'Invalid input'}, status=400)
+
+        query = f'inurl:myshopify.com {name} {industry} {location}'
+        url = f"https://www.googleapis.com/customsearch/v1?key={google_api_key}&cx={search_engine_id}&q={query}"
+
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            results = response.json()
+            urls = results.get('items', [])
+            most_relevant_link = urls[0]['link'] if urls else None
+        except requests.RequestException as e:
+            return JsonResponse({'error': f"Google Custom Search API error: {str(e)}"}, status=500)
+        except ValueError:
+            return JsonResponse({'error': 'Invalid JSON in Google Custom Search API response'}, status=500)
+        except IndexError:
+            return JsonResponse({'error': 'No relevant links found'}, status=404)
+
+        if most_relevant_link:
+            app = FirecrawlApp(api_key=firecrawl_api_key)
+            retry_count = 0
+            while retry_count < 5:
+                try:
+                    scraped_data = app.scrape_url(most_relevant_link)
+                    if scraped_data and 'content' in scraped_data and scraped_data['content']:
+                        content = scraped_data['content']
+                        brand_summary, seo_score, tech_stacks, traffic_analysis = process_website_content(most_relevant_link, content)
+
+                        # Create a new Lead associated with the logged-in user
+                        lead = Lead.objects.create(
+                            user=request.user,
+                            name=name,
+                            contact_no=contact_no,
+                            industry=industry,
+                            location=location,
+                            notes=notes
+                        )
+
+                        # Create ShopifyStoresDetails associated with the created Lead
+                        ShopifyStoresDetails.objects.create(
+                            lead=lead,
+                            link=most_relevant_link,
+                            brand_summary=brand_summary.strip(),
+                            seo_score=seo_score,
+                            tech_stacks='\n'.join(tech_stacks),  # Convert list to newline-separated string
+                            traffic_analysis=traffic_analysis
+                        )
+
+                        success_message = "Lead added successfully"
+                        return render(request, 'dashboard/add_lead.html', {'name': name, 'status': 'Lead added', 'success_message': success_message})
+                except Exception as e:
+                    retry_count += 1
+                    if retry_count == 5:
+                        return JsonResponse({'error': f"Failed to scrape the URL after multiple attempts: {str(e)}"}, status=500)
+        else:
+            return JsonResponse({'error': 'No relevant link found'}, status=404)
+
+    return render(request, 'leads/add_lead.html')
 
 @csrf_exempt
 def get_or_update_lead(request, id):
@@ -191,33 +247,38 @@ def get_or_update_lead(request, id):
         if request.method == 'PUT':
             data = json.loads(request.body)
             name = data.get('name')
-            contact_info = data.get('contact_info')
+            contact_no = data.get('contact_no')
             industry = data.get('industry')
             location = data.get('location')
             notes = data.get('notes')
+            address = data.get('address')
+
             if name:
                 lead.name = name
-            if contact_info:
-                lead.contact_information = contact_info
+            if contact_no:
+                lead.contact_no = contact_no
             if industry:
                 lead.industry = industry
             if location:
                 lead.location = location
             if notes:
                 lead.notes = notes
+            if address:
+                lead.address = address
 
             lead.save()
-            return JsonResponse({'id': lead.id, 'name': lead.name, 'industry': lead.industry, 'status': 'Lead updated'})
+            return JsonResponse({'id': lead.id, 'name': lead.name, 'industry': lead.industry, 'contact_no': lead.contact_no, 'location': lead.location, 'address': lead.address, 'status': 'Lead updated'})
 
         elif request.method == 'GET':
             # Handle GET request to retrieve lead details
             lead_data = {
                 'id': lead.id,
                 'name': lead.name,
-                'contact_info': lead.contact_information,
+                'contact_no': lead.contact_no,
                 'industry': lead.industry,
                 'location': lead.location,
-                'notes': lead.notes
+                'notes': lead.notes,
+                'address': lead.address
             }
             return JsonResponse(lead_data)
 
@@ -235,19 +296,19 @@ def find_leads(request):
         Q(industry__icontains=query) |
         Q(location__icontains=query) |
         Q(name__icontains=query) |
-        Q(contact_information__icontains=query)
+        Q(contact_no=query)
     )
 
     leads_data = [{
         'id': lead.id,
         'name': lead.name,
-        'contact_info': lead.contact_information,
+        'contact_no': lead.contact_no,
         'industry': lead.industry,
         'location': lead.location,
         'notes': lead.notes
     } for lead in leads]
     
-    return JsonResponse(leads_data, safe=False)
+    return render(request, 'leads/find_leads.html', {'leads': leads_data})
 
 
 @csrf_exempt
@@ -265,236 +326,127 @@ def add_notes(request, id):
     except Lead.DoesNotExist:
         return JsonResponse({'error': 'Lead not found'}, status=404)
 
-print(f"Groq API Key: {groq_api_key}")
-
-client = Groq(api_key=groq_api_key)
-
-def summarize_text(text):
-    try:
-        chat_completion = client.chat.completions.create(
-            messages=[
-                {
-                    "role": "user",
-                    "content": f"Summarize the following text and generate a comprehensive summary about the brand, including key details and unique selling points: {text}",
-                }
-            ],
-            model="llama3-8b-8192",
-        )
-        return chat_completion.choices[0].message.content.strip()
-    except Exception as e:
-        return f"Error in summarization: {str(e)}"
-
-
-def generate_custom_suggestions(email_contents):
-    suggestions = []
-
-    for content in email_contents:
-        link = content['link']
-        summary = content['summary']
-        technology_stacks = content['technology stacks']
-        backlink_count = content['backlink_count']
-        traffic_visits = content['traffic_visits']
-
-        # Generate detailed suggestions based on the data
-        suggestion = f"Consider leveraging SEO analytics for {link}. "
-        
-        if backlink_count > 0:
-            suggestion += f"They have a significant backlink profile with {backlink_count} backlinks. "
-        else:
-            suggestion += "They currently have no significant backlinks. "
-        
-        if traffic_visits > 0:
-            suggestion += f"The site receives {traffic_visits} visits per month, indicating a healthy level of traffic. "
-        else:
-            suggestion += "The site does not appear to have significant traffic data available. "
-
-        if technology_stacks:
-            tech_summary = ', '.join([tech['Name'] for tech in technology_stacks])
-            suggestion += f"The site uses the following technologies: {tech_summary}. "
-        else:
-            suggestion += "No technology stack information is available. "
-
-        suggestion += f"Summary: {summary}"
-
-        suggestions.append({
-            'link': link,
-            'suggestion': suggestion
-        })
-
-    return suggestions
 
 @csrf_exempt
-def find_shopify_stores(request):
-    if request.method == 'POST':
-        industry = request.POST.get('industry', '')
-        location = request.POST.get('location', '')
+@login_required
+def generate_shopifystoresdetail(request):
+    user = request.user
+    try:
+        user_profile = UserProfile.objects.get(user=user)
+        industry = user_profile.industry
+        location = user_profile.location
+    except UserProfile.DoesNotExist:
+        return JsonResponse({'error': 'User profile not found'}, status=404)
 
-        if not (industry and location):
-            return JsonResponse({'error': 'Industry and location parameters are required'}, status=400)
+    if not (industry and location):
+        return JsonResponse({'error': 'Industry and location parameters are required'}, status=400)
 
-        query = f'inurl:myshopify.com {industry} {location}'
-        url = f"https://www.googleapis.com/customsearch/v1?key={google_api_key}&cx={search_engine_id}&q={query}"
+    query = f'inurl:myshopify.com {industry} {location}'
+    url = f"https://www.googleapis.com/customsearch/v1?key={google_api_key}&cx={search_engine_id}&q={query}"
 
-        try:
-            response = requests.get(url)
-            response.raise_for_status()  # Raise an error for bad status codes
-            results = response.json()
-        except requests.RequestException as e:
-            return JsonResponse({'error': f"Google Custom Search API error: {str(e)}"}, status=500)
-        except ValueError:
-            return JsonResponse({'error': 'Invalid JSON in Google Custom Search API response'}, status=500)
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an error for bad status codes
+        results = response.json()
+    except requests.RequestException as e:
+        return JsonResponse({'error': f"Google Custom Search API error: {str(e)}"}, status=500)
+    except ValueError:
+        return JsonResponse({'error': 'Invalid JSON in Google Custom Search API response'}, status=500)
 
-        final_links = []
-        email_contents = []
-        suggestions = []
+    final_links = []
+    email_contents = []
 
-        if not firecrawl_api_key:
-            return JsonResponse({'error': 'Firecrawl API key is not set'}, status=500)
+    if not firecrawl_api_key:
+        return JsonResponse({'error': 'Firecrawl API key is not set'}, status=500)
 
-        app = FirecrawlApp(api_key=firecrawl_api_key)
+    app = FirecrawlApp(api_key=firecrawl_api_key)
 
-        for item in results.get('items', []):
-            final_links.append(item['link'])
-            
+    for item in results.get('items', []):
+        final_links.append(item['link'])
 
-            # Retry mechanism for rate limiting
-            retry_count = 0
-            while retry_count < 5:
-                try:
-                    scraped_data = app.scrape_url(item['link'])
-                    if scraped_data and 'content' in scraped_data and scraped_data['content']:
-                        content = scraped_data['content']
-                        print("Markdown content:", content)
+        retry_count = 0
+        while retry_count < 5:
+            try:
+                scraped_data = app.scrape_url(item['link'])
+                if scraped_data and 'content' in scraped_data and scraped_data['content']:
+                    content = scraped_data['content']
+                    brand_summary = summarize_text(content)
+                    # Extract meta and slug from HTML content
+                    meta, slug = extract_meta_and_slug(content)
+                    # Score the website for SEO
+                    seo_score = calculate_seo_score(meta, slug)
+                    # Get backlinks, tech stacks, and traffic analysis
+                    # backlinks = get_backlinks(item['link'])
+                    tech_stacks = get_tech_stacks(item['link'])
+                    traffic_analysis = get_traffic_analysis(item['link'])
 
-                        # # Split text into manageable chunks for summarization
-                        # max_chunk_size = 500  # Adjust as needed
-                        # chunks = [content[i:i + max_chunk_size] for i in range(0, len(content), max_chunk_size)]
+                    ShopifyStoresDetails.objects.create(
+                        link=item['link'],
+                        brand_summary=brand_summary.strip(),
+                        seo_score=seo_score,
+                        # backlinks=backlinks,
+                        tech_stacks=tech_stacks,
+                        traffic_analysis=traffic_analysis
+                    )
 
-                        # Summarize each chunk and concatenate results
-                        brand_summary = ""
-                        # for chunk in chunks:
-                        #     chunk_summary = summarize_text(chunk)
-                        #     brand_summary += chunk_summary + " "
-                        brand_summary = summarize_text(content)
-                        print("Brand Summary:", brand_summary)
+                    email_subject = f"Exploring Collaboration Opportunities with {item['link']}"
+                    email_body_html = render_to_string('email_template.html', {
+                        'item_link': item['link'],
+                        'brand_summary': brand_summary.strip(),
+                        'seo_score': seo_score,
+                        # 'backlinks': backlinks,
+                        'tech_stacks': tech_stacks,
+                        'traffic_analysis': traffic_analysis
+                    })
+                    email_body_text = strip_tags(email_body_html)
 
-                        # Use BuiltWith to get technology stacks
-                        builtwith_url = f"https://api.builtwith.com/v21/api.json?KEY={builtwith_api_key}&LOOKUP={item['link']}"  #Domain API
-                        # builtwith_url = f"https://api.builtwith.com/lists11/api.json?KEY={builtwith_api_key}&TECH=Shopify&LOOKUP={item['link']}"   #Lists API
-                        try:
-                            bw_response = requests.get(builtwith_url)
-                            bw_response.raise_for_status()
-                            bw_data = bw_response.json()
-                            print("BuiltWith data:", bw_data)
-                        except requests.RequestException as e:
-                            bw_data = {'Errors': str(e)}
-                        except ValueError:
-                            bw_data = {'Errors': 'Invalid JSON in BuiltWith API response'}
-                        
+                    email_contents.append({
+                        "link": item['link'],
+                        "summary": brand_summary.strip(),
+                    })
+                else:
+                    email_contents.append({
+                        "link": item['link'],
+                        "summary": "No content available",
+                    })
 
-                        if bw_data.get('Errors'):
-                            # Log error if there are any
-                            print(f"BuiltWith API Error for {item['link']}: {bw_data['Errors']}")
-
-                        technology_stacks = bw_data.get('Groups', [])
-
-                        # Add backlink checking functionality
-                        moz_url = f"https://lsapi.seomoz.com/v2/url_metrics?target={item['link']}&scope=page"
-                        moz_headers = {
-                            'Authorization': f'Basic {base64.b64encode(f"{moz_access_id}:{moz_secret_key}".encode()).decode()}'
-                        }
-                        try:
-                            moz_response = requests.get(moz_url, headers=moz_headers)
-                            moz_response.raise_for_status()
-                            moz_data = moz_response.json()
-                            backlink_count = moz_data.get('external_links', 0)
-                            backlinks = moz_data.get('top_pages', [])  # Adjust according to the API response structure
-                        except requests.RequestException as e:
-                            backlink_count = 0
-                            backlinks = []
-                        except ValueError:
-                            backlink_count = 0
-                            backlinks = []
-
-
-                        # Add traffic analysis functionality
-                        traffic_api_url = f"https://api.similarweb.com/v1/website/{item['link']}/traffic-and-engagement/visits?api_key={similarweb_api_key}"
-                        try:
-                            traffic_response = requests.get(traffic_api_url)
-                            traffic_response.raise_for_status()
-                            traffic_data = traffic_response.json()
-                            traffic_visits = traffic_data.get('visits', 0)
-                            print("Traffic visits:", )
-                        except requests.RequestException as e:
-                            traffic_visits = 0
-                        except ValueError:
-                            traffic_visits = 0
-
-                        # Generate HTML email template
-                        email_subject = f"Exploring Collaboration Opportunities with {item['link']}"
-                        email_body_html = render_to_string('email_template.html', {
-                            'item_link': item['link'],
-                            'brand_summary': brand_summary.strip(),
-                            'technology_stacks': technology_stacks,
-                            'backlink_count': backlink_count,
-                            "backlinks": backlinks,
-                            'traffic_visits': traffic_visits,
-                        })
-                        email_body_text = strip_tags(email_body_html)  # Strip HTML tags for text version
-                        print("email_body_text:", email_body_text)
-
-        
-                        email_contents.append({
-                            "link": item['link'],
-                            "summary": brand_summary.strip(),
-                            "technology stacks": technology_stacks,
-                            "backlink_count": backlink_count,
-                            "backlinks": backlinks,
-                            "traffic_visits": traffic_visits,
-                            "email_subject": email_subject,
-                            "email_body_html": email_body_html
-                        })
-                    else:
-                        email_contents.append({
-                            "link": item['link'],
-                            "summary": "No content available",
-                            "email_subject": email_subject,
-                            "email_body_html": "No content available"
-                        })
-
-                    break
-                except requests.RequestException as e:
-                    if 'rate limit exceeded' in str(e).lower():
-                        retry_count += 1
-                        wait_time = 2 ** retry_count
-                        time.sleep(wait_time)
-                    else:
-                        # Log the exception for debugging
-                        print(f"Error processing {item['link']}: {str(e)}")
-                        email_contents.append({
-                            "link": item['link'],
-                            "summary": f"Error: {str(e)}",
-                            "email_subject": email_subject,
-                            "email_body_html": f"Error: {str(e)}"
-                        })
-                        break
-                except Exception as e:
-                    # Log any other unexpected exceptions
-                    print(f"Unexpected error processing {item['link']}: {str(e)}")
+                break
+            except requests.RequestException as e:
+                if 'rate limit exceeded' in str(e).lower():
+                    retry_count += 1
+                    wait_time = 2 ** retry_count
+                    time.sleep(wait_time)
+                else:
+                    print(f"Error processing {item['link']}: {str(e)}")
                     email_contents.append({
                         "link": item['link'],
                         "summary": f"Error: {str(e)}",
-                        "email_subject": email_subject,
-                        "email_body_html": f"Error: {str(e)}"
                     })
                     break
-        
-        # Generate suggestions based on email_contents
-        suggestions.extend(generate_custom_suggestions(email_contents))
+            except Exception as e:
+                print(f"Unexpected error processing {item['link']}: {str(e)}")
+                email_contents.append({
+                    "link": item['link'],
+                    "summary": f"Error: {str(e)}",
+                })
+                break
+    leads = ShopifyStoresDetails.objects.all()
 
-        return JsonResponse({"Links": final_links, "EmailContents": email_contents, "Suggestions": suggestions})
-    else:
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    # Prepare data for charts and tables
+    lead_data = []
+    for lead in leads:
+        lead_data.append({
+            'link': lead.link,
+            'brand_summary': lead.brand_summary,
+            'seo_score': lead.seo_score,
+            'tech_stacks': lead.tech_stacks,
+            'traffic_analysis': lead.traffic_analysis
+        })
+
+    return render(request, 'leads/all_leads.html', {'leads': lead_data})
+
+
+
 def create_call(request):
     call_result = None
     summary = None 
