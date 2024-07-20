@@ -1,0 +1,114 @@
+{% extends "vertical_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+
+<style>
+
+    .container {
+        background-color: #E0F7FA; /* Lightest blue shade */
+        padding: 2em;
+        border-radius: 15px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 100%;
+        animation: fadeIn 1s ease-in-out, slideIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+        from { transform: translateY(-20px); }
+        to { transform: translateY(0); }
+    }
+
+    h1 {
+        text-align: center;
+        color: #333;
+        font-size: 2.5em;
+        margin-bottom: 0.5em;
+        animation: textBounce 1s ease-in-out;
+    }
+
+    @keyframes textBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    form {
+        margin-top: 1.5em;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 0.5em;
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    textarea {
+        width: 100%;
+        padding: 0.75em;
+        font-size: 1em;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    button {
+        display: block;
+        margin-top: 1em;
+        padding: 0.75em 1.5em;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1.2em;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+</style>
+
+
+
+
+
+{% endblock %}
+
+{% block content %}
+
+<div class="background-overlay"></div>
+    <div class="container">
+        <div class="content-wrapper">
+            <h2>Getting Started</h2>
+            <p class="description">Let's set up your profile to get started.</p>
+            <form id="profileForm" method="post" action="{% url 'profile' %}">
+                {% csrf_token %}
+                <div class="input-group">
+                    <textarea name="business_description" placeholder="Business Description" rows="4" required></textarea>
+                </div>
+                <div class="input-group">
+                    <input type="text" name="industry" placeholder="Industry" required>
+                </div>
+                <div class="input-group">
+                    <input type="text" name="location" placeholder="Location" required>
+                </div>
+                <button type="submit" class="btn">Save Profile</button>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block extra_javascript %}
+
+
+{% endblock %}

@@ -61,47 +61,50 @@ class Company(models.Model):
 
 
 class Call(models.Model):
-    call_id = models.CharField(max_length=255)
+    call_id = models.CharField(max_length=255, unique=True)
     phone_number_id = models.CharField(max_length=255)
     created_at = models.DateTimeField()
-    assistant_first_message = models.CharField(max_length=255)
-    customer_number = models.CharField(max_length=20)
     status = models.CharField(max_length=50)
     cost = models.DecimalField(max_digits=10, decimal_places=2)
+    customer_name = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=20)
+    summary = models.TextField(null=True, blank=True)
+    analytics = models.JSONField(null=True, blank=True)
+    lead_converted = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.call_id
+        return f"Call {self.call_id} - {self.customer_name}"
 
 class CallSummary(models.Model):
-    call = models.OneToOneField(Call, on_delete=models.CASCADE, related_name='summary')
+    call = models.OneToOneField(Call, on_delete=models.CASCADE,related_name='call_summaries')
     summary = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'Summary for {self.call.call_id}'
 
-
 class Lead(models.Model):
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
-    name = models.CharField(max_length=200)
-    contact_no = models.TextField()
+    name = models.CharField(max_length=200, null=True, blank=True)
+    contact_no = models.TextField(null=True, blank=True)
+    email = models.CharField(max_length=200, null=True, blank=True)
+    address = models.CharField(max_length=200, null=True, blank=True)
+    phone_number = models.CharField(max_length=200, null=True, blank=True)
     industry = models.CharField(max_length=200)
     location = models.CharField(max_length=200)
     notes = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-
-
-class ShopifyStoresDetails(models.Model):
-    lead = models.ForeignKey(Lead,on_delete=models.CASCADE)
     link = models.URLField()
     brand_summary = models.TextField()
     traffic_analysis = models.TextField()
     seo_score = models.TextField()
     tech_stacks = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+
+
 
 
 

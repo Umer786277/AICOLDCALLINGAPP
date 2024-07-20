@@ -30,10 +30,18 @@ from groq import Groq
 import time
 from .utils import *
 
+# google_key=""
+# search_engine="<script async src="https://cse.google.com/cse.js?cx=2325bd1cb6f6a4a13">
+# </script>
+# <div class="gcse-search"></div>"
 
-google_api_key = os.getenv('GOOGLE_API_KEY')
-search_engine_id = os.getenv('SEARCH_ENGINE_ID')
-firecrawl_api_key = os.getenv('FIRECRAWL_API_KEY')
+
+# name=Lead.objects.get('name')
+# phone=Lead.objcets..get('')
+
+google_api_key = 'AIzaSyAWzuQN69TtYbCh_nWh6nmuHxbtABnJbDw'
+search_engine_id = '2325bd1cb6f6a4a13'
+firecrawl_api_key = 'fc-ce7d24b36a5b463c8adbf6446a6c330e'
 builtwith_api_key = os.getenv('BUILTWITH_API_KEY')
 backlink_api_key = os.getenv('BACKLINK_API_KEY')
 similarweb_api_key = os.getenv('SIMILARWEB_API_KEY')
@@ -62,7 +70,7 @@ LLM_HEADERS = {
 
 def index(request):
 
-    return render(request,'dashboard/dashboard-3.html')
+    return render(request,'leads/index.html')
 
 
 def signup_page(request):
@@ -104,23 +112,19 @@ def signup(request):
 
 
 def signin(request):
-    if request.user.is_authenticated:
-        messages.warning(request, "You are already logged in")
-        return redirect('/')
-    else:
-        if request.method == 'POST':
-            username = request.POST.get('username')
-            password = request.POST.get('password')
-            print("**********", password)
-            logger.debug("Attempting to authenticate user with username: %s", username)
-            user = authenticate(request, username=username, password=password)  # Check password
-            logger.debug("Authentication result: %s", user)
-            if user is not None:
-                login(request, user)
-                messages.info(request, f"You are logged in as {username}")
-                return redirect('/')
-            else:
-                messages.error(request, "Username or Password is Incorrect")
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        print("**********", password)
+        logger.debug("Attempting to authenticate user with username: %s", username)
+        user = authenticate(request, username=username, password=password)  # Check password
+        logger.debug("Authentication result: %s", user)
+        if user is not None:
+            login(request, user)
+            messages.info(request, f"You are logged in as {username}")
+            return redirect('profile')
+        else:
+            messages.error(request, "Username or Password is Incorrect")
 
     return render(request, 'auth/login-2.html')
 
@@ -133,42 +137,32 @@ def logout_request(request):
 	return redirect("/")
 
 
-
-
-
-
-
-def execute(prompt):
-    llm_data = {
-        "model": "llama3-8b-8192",
-        "messages": [
-            {"role": "user", "content": prompt}
-        ],
-        "temperature": 0.7
-    }
-    
-    response = requests.post(LLM_BASE_URL, headers=LLM_HEADERS, json=llm_data)
-    response.raise_for_status()
-    return response.json()['choices'][0]['message']['content']
-
-def create_a_purpose(lead):
-    prompt = f'{lead} this is the details of a customer, TechRealm sells seo,digital marketing,web development and more. you need to create a prompt for a marketing agent to tell him how to talk to the client what to present and most importantly what to ask the client about.'
-    purpose = execute(prompt)
-    return purpose
-
-def check_lead(summary):
-    prompt = f'You are an AI bot made to analyze summaries, your output is limited to an answer of 1 or 0, 1 stands for if the lead is converted and 0 stands for if the lead is not converted. analyze the summary and answer in 1 or 0 {summary} using the summary analyze if the lead is converted or no if converted only reply with 1 if it is not then reply with 0'
-    result = execute(prompt)
-    return result.strip()
-
-
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        # Handle form submission and save data to UserProfile model
+        business_description = request.POST.get('business_description', '')
+        industry = request.POST.get('industry', '')
+        location = request.POST.get('location', '')
+        
+        # Create a new UserProfile for the current user
+        user_profile = UserProfile.objects.create(
+        user=request.user,
+        business_description=business_description,
+        industry=industry,
+        location=location)
+        # Optionally, you can redirect to another page after saving
+        return redirect('/')  # Redirect to the same profile page after saving
+        
+    # Render the profile page with a form to add details
+    return render(request, 'leads/profile.html')
 
 
 
 def show_leads(request):
-    leads = ShopifyStoresDetails.objects.all()
+    leads = Lead.objects.all()
     return render(request, 'leads/show_leads.html', {'leads': leads})
-
+    
 @login_required
 @csrf_exempt
 def add_lead(request):
@@ -206,30 +200,49 @@ def add_lead(request):
                     scraped_data = app.scrape_url(most_relevant_link)
                     if scraped_data and 'content' in scraped_data and scraped_data['content']:
                         content = scraped_data['content']
-                        brand_summary, seo_score, tech_stacks, traffic_analysis = process_website_content(most_relevant_link, content)
+                        result = process_website_content(most_relevant_link, content)
+
+                        # Parse brand summary
+                        parsed_summary = parse_brand_summary(result['brand_summary'])
+                        logging.debug("Parsed Summary: %s", parsed_summary)
+                        phone_number=parsed_summary['Phone Number']
+                        print(f"*************** {phone_number} provided")
+
+
+                        
+
 
                         # Create a new Lead associated with the logged-in user
-                        lead = Lead.objects.create(
+                        if phone_number:
+                            
+                            lead = Lead.objects.create(
                             user=request.user,
-                            name=name,
+                            link=most_relevant_link,
+                            brand_summary=result['brand_summary'].strip(),
+                            seo_score=result['seo_score'],
+                            tech_stacks='\n'.join(result['tech_stacks']),  # Convert list to newline-separated string
+                            traffic_analysis=result['traffic_analysis'],
+                            name=parsed_summary['Name'] or name,
                             contact_no=contact_no,
                             industry=industry,
                             location=location,
-                            notes=notes
-                        )
+                            notes=notes,
+                            email=parsed_summary['Email'],
+                            address=parsed_summary['Address'],
+                            phone_number=parsed_summary['Phone Number'] )
+                            success_message = "Lead added successfully"
+                            return JsonResponse({'status': 'Lead added', 'success_message': success_message})
+                        else:
+                            error_message = "Lead has no "
+                            if not parsed_summary['Email']:
+                                error_message += "email"
+                            if not parsed_summary['Email'] and not parsed_summary['Phone Number']:
+                                error_message += " or "
+                            if not parsed_summary['Phone Number']:
+                                error_message += "phone number"
 
-                        # Create ShopifyStoresDetails associated with the created Lead
-                        ShopifyStoresDetails.objects.create(
-                            lead=lead,
-                            link=most_relevant_link,
-                            brand_summary=brand_summary.strip(),
-                            seo_score=seo_score,
-                            tech_stacks='\n'.join(tech_stacks),  # Convert list to newline-separated string
-                            traffic_analysis=traffic_analysis
-                        )
-
-                        success_message = "Lead added successfully"
-                        return render(request, 'dashboard/add_lead.html', {'name': name, 'status': 'Lead added', 'success_message': success_message})
+                        return JsonResponse({'status': 'error', 'error_message': error_message})
+                        
                 except Exception as e:
                     retry_count += 1
                     if retry_count == 5:
@@ -379,15 +392,27 @@ def generate_shopifystoresdetail(request):
                     # backlinks = get_backlinks(item['link'])
                     tech_stacks = get_tech_stacks(item['link'])
                     traffic_analysis = get_traffic_analysis(item['link'])
+                    parsed_summary = parse_brand_summary(brand_summary)
 
-                    ShopifyStoresDetails.objects.create(
+                    # phone_number=parsed_summary.get('Phone Number')
+                    # if phone_number:
+                    Lead.objects.create(
+                        user=request.user,
                         link=item['link'],
                         brand_summary=brand_summary.strip(),
                         seo_score=seo_score,
-                        # backlinks=backlinks,
-                        tech_stacks=tech_stacks,
-                        traffic_analysis=traffic_analysis
+                        tech_stacks=tech_stacks,  # Convert list to newline-separated string
+                        traffic_analysis=traffic_analysis,
+                        name=parsed_summary['Name'],
+                        contact_no=parsed_summary['Phone Number'],
+                        industry=industry,
+                        location=location,
+                        email=parsed_summary['Email'],
+                        address=parsed_summary['Address'],
+                        phone_number=parsed_summary['Phone Number']
                     )
+                    
+
 
                     email_subject = f"Exploring Collaboration Opportunities with {item['link']}"
                     email_body_html = render_to_string('email_template.html', {
@@ -430,7 +455,7 @@ def generate_shopifystoresdetail(request):
                     "summary": f"Error: {str(e)}",
                 })
                 break
-    leads = ShopifyStoresDetails.objects.all()
+    leads = Lead.objects.all()
 
     # Prepare data for charts and tables
     lead_data = []
@@ -444,105 +469,248 @@ def generate_shopifystoresdetail(request):
         })
 
     return render(request, 'leads/all_leads.html', {'leads': lead_data})
+ 
 
 
 
+# def create_call(request):
+#     call_result = None
+#     summary = None 
+#     analytics = None  
+#     lead_converted = None  
+    
+#     if request.method == 'POST':
+#         form = CallForm(request.POST)
+#         if form.is_valid():
+#             # Retrieve form data
+#             customer_name = form.cleaned_data['name']
+#             phone_number = form.cleaned_data['phone_number']
+            
+#             # Format phone number to E.164 format if needed (ensure it starts with +)
+#             if not phone_number.startswith('+'):
+#                 phone_number = '+' + phone_number
+            
+#             phone_number_id = '59269006-cf59-4a7e-b3d3-c94cf69ee940'
+#             system_prompt = 'TechRealm sells SEO, digital marketing, web development and more'
+#             system_company = 'techrealm'
+            
+#             headers = {
+#                 'Authorization': f'Bearer {AUTH_TOKEN}',
+#                 'Content-Type': 'application/json',
+#             }
+
+#             # Prepare data payload for the API request
+#             data = {
+#                 'assistant': {
+#                     "firstMessage": f"Hey, is this {customer_name}?",
+#                     "model": {
+#                         "provider": "openai",
+#                         "model": "gpt-3.5-turbo",
+#                         "messages": [
+#                             {
+#                                 "role": "system",
+#                                 "content": f"You are an AI bot called Jennifer. Keep the conversation short, the aim is to get the user to sign up to a calendar for a meeting. You are made to tell a customer about the solutions {system_company} offers. Our services are {system_prompt}. Keep the conversation short and address fast to get the user to sign up to a calendar for a meeting."
+#                             }
+#                         ]
+#                     },
+#                     "voice": "jennifer-playht"
+#                 },
+#                 'phoneNumberId': phone_number_id,
+#                 'customer': {
+#                     'number': phone_number,
+#                     'name': customer_name,
+#                 },
+#             }
+
+#             try:
+#                 # Make the POST request to Vapi to create the phone call
+#                 response = requests.post(f'{BASE_URL}/call/phone', headers=headers, json=data)
+#                 response.raise_for_status()  # Raise an HTTPError for bad responses (4xx or 5xx)
+
+#                 if response.status_code == 201:
+#                     response_data = response.json()
+#                     call_result = {
+#                         'call_id': response_data['id'],
+#                         'phone_number_id': response_data['phoneNumberId'],
+#                         'created_at': response_data['createdAt'],
+#                         'status': response_data['status'],
+#                         'cost': response_data['cost'],
+#                     }
+#                     # Fetch call summary and analytics
+#                     call_id = response_data['id']
+#                     api_key = '16ca8436-91b6-49e7-b382-60d964aaf646'  # Replace with your actual API key
+#                     summary = fetch_call_summary(call_id, api_key)
+#                     analytics = fetch_call_analytics(call_id, api_key)
+                    
+#                     # Check if lead is converted based on analytics
+#                     lead_converted = 1 if check_lead(summary) else 0
+
+#                     call = Call(
+#                         call_id=response_data['id'],
+#                         phone_number_id=response_data['phoneNumberId'],
+#                         created_at=response_data['createdAt'],
+#                         status=response_data['status'],
+#                         cost=response_data['cost'],
+#                         customer_name=customer_name,
+#                         phone_number=phone_number,
+#                         summary=summary,
+#                         analytics=analytics,
+#                         lead_converted=lead_converted
+#                     )
+#                     call.save()
+                    
+#                 else:
+#                     call_result = {'error': f'Failed to create call. Status code: {response.status_code}'}
+            
+#             except requests.exceptions.RequestException as e:
+#                 call_result = {'error': 'Failed to create call. Request error.'}
+            
+#             except requests.exceptions.HTTPError as e:
+#                 call_result = {'error': 'Failed to create call. HTTP error.'}
+        
+#         else:
+#             call_result = {'error': 'Form validation failed.'}
+
+#     else:
+#         form = CallForm()
+
+#     # Render the template with form and call_result data
+#     return render(request, 'auth/create_call.html', {
+#         'form': form,
+#         'call_result': call_result,
+#         'summary': summary,
+#         'analytics': analytics,
+#         'lead_converted': lead_converted,
+#     })
+
+
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Call
+import requests
+
+@login_required
 def create_call(request):
     call_result = None
     summary = None 
     analytics = None  
-    lead_converted = None  
-    
-    if request.method == 'POST':
-        form = CallForm(request.POST)
-        if form.is_valid():
-            # Retrieve form data
-            customer_name = form.cleaned_data['name']
-            phone_number = form.cleaned_data['phone_number']
-            
-            # Format phone number to E.164 format if needed (ensure it starts with +)
-            if not phone_number.startswith('+'):
-                phone_number = '+' + phone_number
-            
-            phone_number_id = '59269006-cf59-4a7e-b3d3-c94cf69ee940'
-            system_prompt = 'TechRealm sells SEO, digital marketing, web development and more'
-            system_company = 'techrealm'
-            
-            headers = {
-                'Authorization': f'Bearer {AUTH_TOKEN}',
-                'Content-Type': 'application/json',
-            }
+    lead_converted = None
 
-            # Prepare data payload for the API request
-            data = {
-                'assistant': {
-                    "firstMessage": f"Hey, is this {customer_name}?",
-                    "model": {
-                        "provider": "openai",
-                        "model": "gpt-3.5-turbo",
-                        "messages": [
-                            {
-                                "role": "system",
-                                "content": f"You are an AI bot called Jennifer. Keep the conversation short, the aim is to get the user to sign up to a calendar for a meeting. You are made to tell a customer about the solutions {system_company} offers. Our services are {system_prompt}. Keep the conversation short and address fast to get the user to sign up to a calendar for a meeting."
-                            }
-                        ]
-                    },
-                    "voice": "jennifer-playht"
-                },
-                'phoneNumberId': phone_number_id,
-                'customer': {
-                    'number': phone_number,
-                    'name': customer_name,
-                },
-            }
+    # Get the latest call for the currently logged-in user
+    latest_call = Lead.objects.filter(user=request.user).order_by('-created_at').first()
 
-            try:
-                # Make the POST request to Vapi to create the phone call
-                response = requests.post(f'{BASE_URL}/call/phone', headers=headers, json=data)
-                response.raise_for_status()  # Raise an HTTPError for bad responses (4xx or 5xx)
-
-                if response.status_code == 201:
-                    response_data = response.json()
-                    call_result = {
-                        'call_id': response_data['id'],
-                        'phone_number_id': response_data['phoneNumberId'],
-                        'created_at': response_data['createdAt'],
-                        'status': response_data['status'],
-                        'cost': response_data['cost'],
-                    }
-                    # Fetch call summary and analytics
-                    call_id = response_data['id']
-                    api_key = '16ca8436-91b6-49e7-b382-60d964aaf646'  # Replace with your actual API key
-                    summary = fetch_call_summary(call_id, api_key)
-                    analytics = fetch_call_analytics(call_id, api_key)
-                    
-                    # Check if lead is converted based on analytics
-                    lead_converted = 1 if check_lead(summary) else 0
-                    
-                else:
-                    call_result = {'error': f'Failed to create call. Status code: {response.status_code}'}
-            
-            except requests.exceptions.RequestException as e:
-                call_result = {'error': 'Failed to create call. Request error.'}
-            
-            except requests.exceptions.HTTPError as e:
-                call_result = {'error': 'Failed to create call. HTTP error.'}
+    if latest_call:
+        customer_name = latest_call.name
+        phone_number = latest_call.phone_number
+        phone_number=phone_number.remove
         
-        else:
-            call_result = {'error': 'Form validation failed.'}
+        # Clean up phone number: remove non-digit characters and spaces, and ensure it starts with +
+        phone_number = re.sub(r'\D', '', phone_number)  # Remove non-digit characters
+        phone_number = re.sub(r'\s+', '', phone_number)  # Remove whitespace characters
+        # Format phone number to E.164 format if needed (ensure it starts with +)
+        if not phone_number.startswith('+'):
+            phone_number = '+' + phone_number
+
+        phone_number_id = '59269006-cf59-4a7e-b3d3-c94cf69ee940'
+        system_prompt = 'TechRealm sells SEO, digital marketing, web development and more'
+        system_company = 'techrealm'
+
+        headers = {
+            'Authorization': f'Bearer {AUTH_TOKEN}',
+            'Content-Type': 'application/json',
+        }
+
+        # Prepare data payload for the API request
+        data = {
+            'assistant': {
+                "firstMessage": f"Hey, is this {customer_name}?",
+                "model": {
+                    "provider": "openai",
+                    "model": "gpt-3.5-turbo",
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": f"You are an AI bot called Jennifer. Keep the conversation short, the aim is to get the user to sign up to a calendar for a meeting. You are made to tell a customer about the solutions {system_company} offers. Our services are {system_prompt}. Keep the conversation short and address fast to get the user to sign up to a calendar for a meeting."
+                        }
+                    ]
+                },
+                "voice": "jennifer-playht"
+            },
+            'phoneNumberId': phone_number_id,
+            'customer': {
+                'number': phone_number,
+                'name': customer_name,
+            },
+        }
+        logger.debug(f'Sending payload to Vapi: {json.dumps(data, indent=2)}')
+
+        try:
+            # Make the POST request to Vapi to create the phone call
+            response = requests.post(f'{BASE_URL}/call/phone', headers=headers, json=data)
+            response.raise_for_status()  # Raise an HTTPError for bad responses (4xx or 5xx)
+
+            if response.status_code == 201:
+                response_data = response.json()
+                call_result = {
+                    'call_id': response_data['id'],
+                    'phone_number_id': response_data['phoneNumberId'],
+                    'created_at': response_data['createdAt'],
+                    'status': response_data['status'],
+                    'cost': response_data['cost'],
+                }
+                print("********", call_result)
+                # Fetch call summary and analytics
+                call_id = response_data['id']
+                api_key = '16ca8436-91b6-49e7-b382-60d964aaf646'  # Replace with your actual API key
+                summary = fetch_call_summary(call_id, api_key)
+                analytics = fetch_call_analytics(call_id, api_key)
+
+                # Check if lead is converted based on analytics
+                lead_converted = 1 if check_lead(summary) else 0
+
+                # Save call details to the database
+                new_call = Call(
+                    user=request.user,
+                    call_id=response_data['id'],
+                    phone_number_id=response_data['phoneNumberId'],
+                    created_at=response_data['createdAt'],
+                    status=response_data['status'],
+                    cost=response_data['cost'],
+                    customer_name=customer_name,
+                    phone_number=phone_number,
+                    summary=summary,
+                    analytics=analytics,
+                    lead_converted=lead_converted
+                )
+                new_call.save()
+
+            else:
+                call_result = {'error': f'Failed to create call. Status code: {response.status_code}'}
+
+        except requests.exceptions.RequestException as e:
+            call_result = {'error': 'Failed to create call. Request error.'}
+
+        except requests.exceptions.HTTPError as e:
+            call_result = {'error': 'Failed to create call. HTTP error.'}
 
     else:
-        form = CallForm()
+        call_result = {'error': 'No previous call found for this user.'}
 
-    # Render the template with form and call_result data
+    # Render the template with call_result data
     return render(request, 'auth/create_call.html', {
-        'form': form,
         'call_result': call_result,
         'summary': summary,
         'analytics': analytics,
         'lead_converted': lead_converted,
+        'latest_call': latest_call,
     })
 
+
+def top_ten_calls(request):
+    calls = Call.objects.all().order_by('-created_at')[:10]
+    print("**************",calls)
+    context = {'calls': calls}
+    return render(request, 'leads/top_ten_calls.html', context)
 
 def fetch_call_summary(call_id, api_key):
     url = f"{BASE_URL}/call/{call_id}"

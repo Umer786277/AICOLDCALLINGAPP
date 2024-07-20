@@ -1,111 +1,44 @@
-{% extends "vertical_base.html" %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block extra_css %}
-
-
-<style>
-    .content {
-        flex: 1;
-        padding: 40px;
-        margin-left: 250px; /* Adjust for drawer width */
-        background-color: #ffffff; /* White background for content area */
-        overflow-y: auto;
-    }
-    .heading {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 20px;
-        color: #004085; /* Dark blue color for heading */
-    }
-    .dropdown {
-        display: none;
-        flex-direction: column;
-        padding-left: 10px;
-    }
-    .dropdown a {
-        margin-bottom: 5px;
-        padding-left: 20px;
-        background-color: #e9f7fc; /* Very light blue background for dropdown items */
-        border-left: 3px solid #004085; /* Blue left border for dropdown items */
-    }
-    .drawer .dropdown-btn {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #e9f7fc; /* Very light blue background for dropdown button */
-    }
-    .drawer .dropdown-btn::after {
-        content: '▼';
-        font-size: 12px;
-        margin-left: auto;
-        transition: transform 0.3s;
-    }
-    .drawer .dropdown-btn.active::after {
-        transform: rotate(-180deg);
-    }
-    table {
-        width: 100%;
-        margin-top: 20px;
-        border-collapse: collapse;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    th, td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #ddd; /* Light grey border */
-    }
-    th {
-        background-color: #004085; /* Dark blue background for table header */
-        color: #fff; /* White text color */
-        font-weight: bold;
-        text-transform: uppercase;
-    }
-    tr:nth-child(even) {
-        background-color: #f2f2f2; /* Light grey background for even rows */
-    }
-    tr:hover {
-        background-color: #e9f7fc; /* Very light blue background for hover effect */
-    }
-
-   
-</style>
-
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-
-<div class="content">
-    <h1>All Leads</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Link</th>
-                <th>Brand Summary</th>
-                <th>SEO Score</th>
-                <th>Tech Stacks</th>
-                <th>Traffic Analysis</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for lead in leads %}
-            <tr>
-                <td>{{ lead.link }}</td>
-                <td>{{ lead.brand_summary }}</td>
-                <td>{{ lead.seo_score }}</td>
-                <td>{{ lead.tech_stacks }}</td>
-                <td>{{ lead.traffic_analysis }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="bg-white p-4 shadow">
+        <h1 class="heading">All Leads</h1>
+        <table class="table table-bordered table-hover mt-4">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Link</th>
+                    <th>Brand Summary</th>
+                    <th>SEO Score</th>
+                    <th>Tech Stacks</th>
+                    <th>Traffic Analysis</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lead in leads %}
+                <tr>
+                    <td>{{ lead.link }}</td>
+                    <td>{{ lead.brand_summary }}</td>
+                    <td>{{ lead.seo_score }}</td>
+                    <td>{{ lead.tech_stacks }}</td>
+                    <td>{{ lead.traffic_analysis }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
-
 {% endblock %}
 
-
 {% block extra_javascript %}
-
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script>
     function toggleDropdown(id) {
         var dropdown = document.getElementById(id);
@@ -119,5 +52,4 @@
         }
     }
 </script>
-
 {% endblock %}

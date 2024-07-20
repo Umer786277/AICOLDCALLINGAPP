@@ -66,12 +66,21 @@ from groq import Groq
 from dotenv import load_dotenv
 load_dotenv()
 
-groq_api_key  = os.getenv('GROQ_API_KEY')
+groq_api_key  = "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"
 
-client = Groq(api_key="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")
+client = Groq(api_key="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")
 model = "llama3-8b-8192"
 
-def summarize_text(text, chunk_size=500):
+
+
+
+
+
+
+
+ 
+
+def summarize_text(text, chunk_size=1000):
     summary = ""
     for i in range(0, len(text), chunk_size):
         chunk = text[i:i + chunk_size]
@@ -81,7 +90,7 @@ def summarize_text(text, chunk_size=500):
                 messages=[
                     {
                         "role": "user",
-                        "content": f"Summarize the following text to create a concise summary about the brand, must include key details such as name, address, phone number, and unique selling points: {combined_text}",
+                        "content": f"Summarize the following text to create a concise summary about the brand. The summary must include key details such as name, address, phone number, email, and unique selling points. If any details are not found, write 'not provided'. Format the summary in a list. For example: \n\nName: Scents N Stories\nAddress: Lahore\nPhone Number: +92 311 100 7862\nEmail: test@gmail.com\n\nUnique Selling Points: [Unique points about the brand]\n\nText to summarize: {combined_text}",
                     }
                 ],
                 model="llama3-8b-8192",
@@ -99,7 +108,7 @@ def calculate_seo_score(meta, slug):
             messages=[
                 {
                     "role": "user",
-                    "content": f"Calculate the SEO score based on the following meta and slug information:\nMeta: {meta}\nSlug: {slug}",
+                    "content": f"Calculate the SEO score based on the following meta and slug information:\nMeta: {meta}\nSlug: {slug}, Just Provide me the Scores with headings",
                 }
             ],
             model=model,
@@ -116,7 +125,7 @@ def get_tech_stacks(url):
             messages=[
                 {
                     "role": "user",
-                    "content": f"Identify the technology stacks used by the website at the following URL: {url}",
+                    "content": f"Identify the technology stacks used by the website at the following URL: {url}, Just give me the names of Technology stacks.",
                 }
             ],
             model=model,
@@ -134,7 +143,7 @@ def get_traffic_analysis(url):
             messages=[
                 {
                     "role": "user",
-                    "content": f"Provide a traffic analysis for the website at the following URL: {url}",
+                    "content": f"Provide a traffic analysis for the website at the following URL: {url}. Please provide me concise ad accurate traffic analysis",
                 }
             ],
             model=model,
@@ -156,75 +165,78 @@ def extract_meta_and_slug(html_content):
     
     return meta, slug
 
-def process_website_content(url, html_content):
-    meta, slug = extract_meta_and_slug(html_content)
-    chunk_size = 200  # Adjust this chunk size based on your requirements
-    chunks = [html_content[i:i+chunk_size] for i in range(0, len(html_content), chunk_size)]
-    # Step 1: Summarize HTML content
-    brand_summary = ""
-    for chunk in chunks:
-        try:
-            summary_prompt = f"Summarize the following text to create a concise summary about the brand:\n\n{chunk}"
-            summary_response = client.chat.completions.create(
-                messages=[
-                    {
-                        "role": "user",
-                        "content": summary_prompt
-                    }
-                ],
-                model=model,
-            )
-            brand_summary += summary_response.choices[0].message.content.strip() + "\n"
-        except Exception as e:
-            brand_summary = f"Error processing website content for summary: {str(e)}"
-            break  # Exit loop on error
+from bs4 import BeautifulSoup
 
-    # Step 2: Calculate SEO score
-    try:
-        seo_prompt = f"Calculate the SEO score based on the following meta and slug information:\nMeta: {meta}\nSlug: {slug}"
-        seo_response = client.chat.completions.create(
-            messages=[
-                {
-                    "role": "user",
-                    "content": seo_prompt
-                }
-            ],
-            model=model,
-        )
-        seo_score = seo_response.choices[0].message.content.strip()
-    except Exception as e:
-        seo_score = f"Error processing website content for SEO score: {str(e)}"
+
+def extract_meta_and_slug_soup(html_content):
+    soup = BeautifulSoup(html_content, 'html.parser')
     
-    # Step 3: Identify technology stacks
-    try:
-        tech_prompt = f"Identify the technology stacks used by the website at the following URL: {url}"
-        tech_response = client.chat.completions.create(
-            messages=[
-                {
-                    "role": "user",
-                    "content": tech_prompt
-                }
-            ],
-            model=model,
-        )
-        tech_stacks = tech_response.choices[0].message.content.strip().split('\n')
-    except Exception as e:
-        tech_stacks = [f"Error processing website content for technology stacks: {str(e)}"]
+    # Extract meta description
+    meta_tag = soup.find('meta', attrs={'name': 'description'})
+    if meta_tag:
+        meta = meta_tag['content']
+    else:
+        meta = 'No meta description available'
+        print("Meta tag not found")
+
+    # Extract slug
+    canonical_link = soup.find('link', rel='canonical')
+    if canonical_link:
+        slug = canonical_link['href'].split('/')[-1]
+    else:
+        slug = 'No slug available'
+        print("Canonical link not found")
     
-    # Step 4: Provide traffic analysis
-    try:
-        traffic_prompt = f"Provide a traffic analysis for the website at the following URL: {url}"
-        traffic_response = client.chat.completions.create(
-            messages=[
-                {
-                    "role": "user",
-                    "content": traffic_prompt
-                }
-            ],
-            model=model,
-        )
-        traffic_analysis = traffic_response.choices[0].message.content.strip()
-    except Exception as e:
-        traffic_analysis = f"Error processing website content for traffic analysis: {str(e)}"
+    return meta, slug
+
+# Function to process website content
+def process_website_content(url, html_content):
+    print(html_content)
+    meta, slug = extract_meta_and_slug_soup(html_content)
+    print('hehe=>new',meta, slug)
+    # Summarize HTML content
+    brand_summary = summarize_text(html_content)
+    print("Brand Summary:       ",brand_summary)
+    tech_stacks = get_tech_stacks(url)
+    # Calculate SEO score
+    seo_score = calculate_seo_score(meta, slug)
     
-    return brand_summary, seo_score, tech_stacks, traffic_analysis
+    # Provide traffic analysis
+    traffic_analysis = get_traffic_analysis(url)
+    
+    return {
+        "brand_summary": brand_summary,
+        "seo_score": seo_score,
+        "tech_stacks": tech_stacks,
+        "traffic_analysis": traffic_analysis
+    }
+
+
+def parse_brand_summary(summary):
+    # Define patterns for extracting key-value pairs
+    patterns = {
+        'Name': r'Name:\s*(.*?)\n',
+        'Phone Number': r'Phone Number:\s*([+0-9\s()-]+)\n',
+        'Email': r'Email:\s*(.*?)\n',
+        'Address': r'Address:\s*(.*?)\n',
+        'Unique Selling Points': r'Unique Selling Points:\s*(.*)'
+    }
+
+    # Initialize variables to store extracted values
+    extracted_values = {
+        'Name': None,
+        'Phone Number': None,
+        'Email': None,
+        'Address': None,
+        'Unique Selling Points': None
+    }
+
+    print("extracted values from  brand summary",extracted_values)
+
+    # Extract values using regex patterns
+    for key, pattern in patterns.items():
+        match = re.search(pattern, summary, re.IGNORECASE)
+        if match:
+            extracted_values[key] = match.group(1).strip()
+
+    return extracted_values
