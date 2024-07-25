@@ -211,32 +211,42 @@ def process_website_content(url, html_content):
         "traffic_analysis": traffic_analysis
     }
 
+import re
 
-def parse_brand_summary(summary):
-    # Define patterns for extracting key-value pairs
-    patterns = {
-        'Name': r'Name:\s*(.*?)\n',
-        'Phone Number': r'Phone Number:\s*([+0-9\s()-]+)\n',
-        'Email': r'Email:\s*(.*?)\n',
-        'Address': r'Address:\s*(.*?)\n',
-        'Unique Selling Points': r'Unique Selling Points:\s*(.*)'
+def parse_brand_summary(brand_summary):
+    # Using regular expressions to find the required fields
+    name_match = re.search(r'\*\*Name:\*\*\s*(.*)', brand_summary)
+    phone_number_match = re.search(r'\*\*Phone Number:\*\*\s*(.*)', brand_summary)
+    email_match = re.search(r'\*\*Email:\*\*\s*(.*)', brand_summary)
+    address_match = re.search(r'\*\*Address:\*\*\s*(.*)', brand_summary)
+
+    return {
+        'Name': name_match.group(1) if name_match else None,
+        'Phone Number': phone_number_match.group(1) if phone_number_match else None,
+        'Email': email_match.group(1) if email_match else None,
+        'Address': address_match.group(1) if address_match else None,
     }
 
-    # Initialize variables to store extracted values
-    extracted_values = {
-        'Name': None,
-        'Phone Number': None,
-        'Email': None,
-        'Address': None,
-        'Unique Selling Points': None
-    }
 
-    print("extracted values from  brand summary",extracted_values)
-
-    # Extract values using regex patterns
-    for key, pattern in patterns.items():
-        match = re.search(pattern, summary, re.IGNORECASE)
-        if match:
-            extracted_values[key] = match.group(1).strip()
-
-    return extracted_values
+# New function to get the brand category
+def get_brand_category(brand_summary):
+    parsed_data = parse_brand_summary(brand_summary)
+    brand_name = parsed_data.get("Name")
+    if not brand_name:
+        return "Brand name not found in summary"
+    
+    try:
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Based on the following brand summary {parsed_data},  determine the single-word category it deals in (e.g., shoes, clothing, electronics, etc.): {brand_name}",
+                }
+            ],
+            model=model,
+        )
+        category = chat_completion.choices[0].message.content.strip()
+    except Exception as e:
+        category = f"Error in fetching brand category: {str(e)}"
+    
+    return category

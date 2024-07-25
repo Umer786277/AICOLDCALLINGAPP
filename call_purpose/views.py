@@ -201,19 +201,21 @@ def add_lead(request):
                     if scraped_data and 'content' in scraped_data and scraped_data['content']:
                         content = scraped_data['content']
                         result = process_website_content(most_relevant_link, content)
+                        print(f"result : {result}")
 
                         # Parse brand summary
+                        category = get_brand_category(result['brand_summary'])
+                        category=category.split('**')
+                        category=category[1]
+                        print(f"The brand deals in: {category}")
+
                         parsed_summary = parse_brand_summary(result['brand_summary'])
                         logging.debug("Parsed Summary: %s", parsed_summary)
                         phone_number=parsed_summary['Phone Number']
-                        print(f"*************** {phone_number} provided")
-
-
-                        
-
+                        print(f"Phone Number {phone_number} provided")
 
                         # Create a new Lead associated with the logged-in user
-                        if phone_number:
+                        if phone_number and phone_number.lower() != 'not provided':
                             
                             lead = Lead.objects.create(
                             user=request.user,
@@ -229,17 +231,12 @@ def add_lead(request):
                             notes=notes,
                             email=parsed_summary['Email'],
                             address=parsed_summary['Address'],
-                            phone_number=parsed_summary['Phone Number'] )
+                            phone_number=parsed_summary['Phone Number'],
+                            category=category, )
                             success_message = "Lead added successfully"
                             return JsonResponse({'status': 'Lead added', 'success_message': success_message})
                         else:
-                            error_message = "Lead has no "
-                            if not parsed_summary['Email']:
-                                error_message += "email"
-                            if not parsed_summary['Email'] and not parsed_summary['Phone Number']:
-                                error_message += " or "
-                            if not parsed_summary['Phone Number']:
-                                error_message += "phone number"
+                            return JsonResponse({'status': 'error', 'error_message': 'Phone number not provided'})
 
                         return JsonResponse({'status': 'error', 'error_message': error_message})
                         
@@ -602,7 +599,7 @@ def create_call(request):
     if latest_call:
         customer_name = latest_call.name
         phone_number = latest_call.phone_number
-        phone_number=phone_number.remove
+        
         
         # Clean up phone number: remove non-digit characters and spaces, and ensure it starts with +
         phone_number = re.sub(r'\D', '', phone_number)  # Remove non-digit characters
@@ -670,7 +667,7 @@ def create_call(request):
 
                 # Save call details to the database
                 new_call = Call(
-                    user=request.user,
+                    
                     call_id=response_data['id'],
                     phone_number_id=response_data['phoneNumberId'],
                     created_at=response_data['createdAt'],

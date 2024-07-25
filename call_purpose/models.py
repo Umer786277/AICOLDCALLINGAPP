@@ -99,6 +99,7 @@ class Lead(models.Model):
     seo_score = models.TextField()
     tech_stacks = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    category = models.CharField(max_length=50)  # Add this line
 
     def __str__(self):
         return self.name
