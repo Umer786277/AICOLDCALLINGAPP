@@ -115,19 +115,26 @@ def signin(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        print("**********", password)
         logger.debug("Attempting to authenticate user with username: %s", username)
         user = authenticate(request, username=username, password=password)  # Check password
         logger.debug("Authentication result: %s", user)
         if user is not None:
             login(request, user)
             messages.info(request, f"You are logged in as {username}")
-            return redirect('profile')
+
+            # Check if the user has an associated profile
+            try:
+                profile = user.userprofile  # Assuming you have a OneToOne relation with UserProfile
+                if profile:
+                    return redirect('/')  # Redirect to home if profile exists
+            except UserProfile.DoesNotExist:
+                pass
+
+            return redirect('profile')  # Redirect to profile if no profile exists
         else:
             messages.error(request, "Username or Password is Incorrect")
 
     return render(request, 'auth/login-2.html')
-
 
 
 @login_required
