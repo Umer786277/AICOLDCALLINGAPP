@@ -28,6 +28,7 @@ Django==3.2.16
 django-allauth==0.63.3
 django-ckeditor==5.9.0
 django-cors-headers==3.11.0
+django-crispy-forms>=1.13.0
 django-debug-toolbar==3.7.0
 django-filter==21.1
 django-heroku==0.3.1
