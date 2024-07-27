@@ -108,15 +108,17 @@
         <li>
           <a href="#sidebarCrm" data-bs-toggle="collapse">
             <i data-feather="users"></i>
-            <span> AI </span>
+            <span> AI Calling </span>
             <span class="menu-arrow"></span>
           </a>
           <div class="collapse" id="sidebarCrm">
             <ul class="nav-second-level">
               <li>
-                <a href="#">Copaigns</a>
+                <a href="{% url 'create_calling_campaign' %}">Campaigns</a>
               </li>
-             
+              <li>
+                <a href="{% url 'campaigns_list' %}">Campaigns List</a>
+              </li>
              
             </ul>
           </div>

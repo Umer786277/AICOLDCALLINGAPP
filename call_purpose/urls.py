@@ -21,7 +21,9 @@ urlpatterns = [
     path('lead/<int:id>/',views.get_or_update_lead, name='get-or-update-lead'),
     path('lead/find/', views.find_leads, name='find-leads'),
     path('lead/<int:id>/add_notes/',views.add_notes, name='add-notes'),
-    path('top-ten/', views.top_ten_calls, name='top-ten')
+    path('top-ten/', views.top_ten_calls, name='top-ten'),
+    path('create_calling_campaign/', views.create_calling_campaign, name='create_calling_campaign'),
+     path('campaigns_list/', views.campaigns_list, name='campaigns_list'),
 ]
 
 

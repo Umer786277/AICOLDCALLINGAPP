@@ -872,3 +872,146 @@ def check_lead(summary):
             return '0'  # Default to not converted if the response is not as expected
     else:
         return '0'  # Default to not converted if there's an error
+
+
+
+
+#Compagins Part
+
+@csrf_exempt
+@login_required
+def create_calling_campaign(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        no_of_target_leads = int(request.POST.get('no_of_target_leads'))
+        category = request.POST.get('category')
+        call_of_action = request.POST.get('call_of_action')
+
+        # Create the campaign
+        campaign = Campaign.objects.create(
+            name=name,
+            no_of_target_leads=no_of_target_leads,
+            category=category,
+            call_of_action=call_of_action
+        )
+
+        # Fetch the required leads based on category
+        leads = Lead.objects.filter(
+            category=category,
+            phone_number__isnull=False
+        ).exclude(
+            phone_number=''
+        )[:no_of_target_leads]
+
+        if not leads:
+            return HttpResponse("No leads found", status=404)
+
+        call_logs = []
+        for lead in leads:
+            customer_name = lead.name
+            phone_number = lead.phone_number
+
+            # Clean up phone number
+            phone_number = re.sub(r'\D', '', phone_number)
+            phone_number = re.sub(r'\s+', '', phone_number)
+            if not phone_number.startswith('+'):
+                phone_number = '+' + phone_number
+
+            phone_number_id = '59269006-cf59-4a7e-b3d3-c94cf69ee940'
+            system_prompt = 'TechRealm sells SEO, digital marketing, web development and more'
+            system_company = 'techrealm'
+
+            headers = {
+                'Authorization': f'Bearer {AUTH_TOKEN}',
+                'Content-Type': 'application/json',
+            }
+
+            # Prepare data payload for the API request
+            data = {
+                'assistant': {
+                    "firstMessage": f"Hey, is this {customer_name}?",
+                    "model": {
+                        "provider": "openai",
+                        "model": "gpt-3.5-turbo",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": f"You are an AI bot called Jennifer. Keep the conversation short, the aim is to get the user to sign up to a calendar for a meeting. You are made to tell a customer about the solutions {system_company} offers. Our services are {system_prompt}. Keep the conversation short and address fast to get the user to sign up to a calendar for a meeting."
+                            }
+                        ]
+                    },
+                    "voice": "jennifer-playht"
+                },
+                'phoneNumberId': phone_number_id,
+                'customer': {
+                    'number': phone_number,
+                    'name': customer_name,
+                },
+            }
+            logger.debug(f'Sending payload to Vapi: {json.dumps(data, indent=2)}')
+
+            try:
+                # Make the POST request to Vapi to create the phone call
+                response = requests.post(f'{BASE_URL}/call/phone', headers=headers, json=data)
+                response.raise_for_status()  # Raise an HTTPError for bad responses (4xx or 5xx)
+
+                if response.status_code == 201:
+                    response_data = response.json()
+                    call_result = {
+                        'call_id': response_data['id'],
+                        'phone_number_id': response_data['phoneNumberId'],
+                        'created_at': response_data['createdAt'],
+                        'status': response_data['status'],
+                        'cost': response_data['cost'],
+                    }
+                    # Fetch call summary and analytics
+                    call_id = response_data['id']
+                    api_key = '16ca8436-91b6-49e7-b382-60d964aaf646'  # Replace with your actual API key
+                    summary = fetch_call_summary(call_id, api_key)
+                    analytics = fetch_call_analytics(call_id, api_key)
+
+                    # Check if lead is converted based on analytics
+                    lead_converted = 1 if check_lead(summary) else 0
+
+                    # Save call details to the database
+                    new_call = Call(
+                        
+                        call_id=response_data['id'],
+                        phone_number_id=response_data['phoneNumberId'],
+                        created_at=response_data['createdAt'],
+                        status=response_data['status'],
+                        cost=response_data['cost'],
+                        customer_name=customer_name,
+                        phone_number=phone_number,
+                        summary=summary,
+                        analytics=analytics,
+                        lead_converted=lead_converted
+                    )
+                    call_logs.append(new_call)
+                else:
+                    logger.error(f'Failed to create call. Status code: {response.status_code}')
+
+            except requests.exceptions.RequestException as e:
+                logger.error('Failed to create call. Request error.', exc_info=e)
+
+            except requests.exceptions.HTTPError as e:
+                logger.error('Failed to create call. HTTP error.', exc_info=e)
+
+        # Bulk create CallLogs for efficiency
+        Call.objects.bulk_create(call_logs)
+        # return redirect('campaigns_list')
+
+        return render(request, 'leads/campaign_success.html', {'call_logs': call_logs,'campaign': campaign,'summary': summary,
+             'analytics': analytics,})
+
+    # Fetch unique categories for the dropdown
+    categories = Lead.objects.values_list('category', flat=True).distinct()
+    return render(request, 'leads/create_calling_compign.html', {'categories': categories})
+
+
+
+@login_required
+def campaigns_list(request):
+    campaigns = Campaign.objects.all()
+    return render(request, 'leads/campaigns_list.html', {'campaigns': campaigns})
+

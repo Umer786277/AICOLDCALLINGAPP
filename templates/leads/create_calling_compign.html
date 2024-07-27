@@ -1,0 +1,90 @@
+{% extends "vertical_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .form-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .form-control {
+        box-shadow: none;
+    }
+    /* Custom dropdown styles to avoid conflicts */
+    .form-group .custom-select {
+        padding: .375rem .75rem;
+        border-radius: .25rem;
+        border: 1px solid #ced4da;
+        background-color: #fff;
+        height: calc(2.25rem + 2px);
+        line-height: 1.5;
+    }
+    .form-group .custom-select:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 .2rem rgba(38, 143, 255, .25);
+        outline: 0;
+    }
+    /* Custom form control for input fields */
+    .form-group .form-control {
+        border-radius: .25rem;
+        border: 1px solid #ced4da;
+        padding: .375rem .75rem;
+        background-color: #fff;
+    }
+    .form-group .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 .2rem rgba(38, 143, 255, .25);
+        outline: 0;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container form-container">
+    <div class="form-header">
+        <h1>Create Calling Campaign</h1>
+    </div>
+    <form method="POST" action="{% url 'create_calling_campaign' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name">Campaign Name:</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="no_of_target_leads">Number of Target Leads:</label>
+            <input type="number" class="form-control" id="no_of_target_leads" name="no_of_target_leads" required>
+        </div>
+        <div class="form-group">
+            <label for="category">Category:</label>
+            <select class="custom-select" id="category" name="category" required>
+                <option value="" disabled selected>Select Category</option>
+                {% for category in categories %}
+                    <option value="{{ category }}">{{ category }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="call_of_action">Call of Action:</label>
+            <input type="text" class="form-control" id="call_of_action" name="call_of_action" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Create Campaign</button>
+    </form>
+</div>
+{% endblock %}

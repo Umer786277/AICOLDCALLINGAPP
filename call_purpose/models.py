@@ -117,3 +117,10 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f'{self.user.username} Profile'
+
+class Campaign(models.Model):
+    name = models.CharField(max_length=255)
+    no_of_target_leads = models.IntegerField()
+    category = models.CharField(max_length=100)
+    call_of_action = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)

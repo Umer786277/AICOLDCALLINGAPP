@@ -1,0 +1,57 @@
+{% extends "vertical_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .table-container {
+        margin: 50px auto;
+        max-width: 900px;
+    }
+    .table {
+        margin-bottom: 30px;
+    }
+    .table th, .table td {
+        vertical-align: middle;
+    }
+    .table th {
+        background-color: #f8f9fa;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container table-container">
+    <h2 class="text-center">Campaigns List</h2>
+    <table class="table table-bordered table-hover">
+        <thead class="bg-dark text-white">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Number of Target Leads</th>
+                <th scope="col">Category</th>
+                <th scope="col">Call of Action</th>
+                <th scope="col">Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for campaign in campaigns %}
+            <tr>
+                <td>{{ campaign.name }}</td>
+                <td>{{ campaign.no_of_target_leads }}</td>
+                <td>{{ campaign.category }}</td>
+                <td>{{ campaign.call_of_action }}</td>
+                <td>{{ campaign.created_at|date:"Y-m-d - H:i" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
